@@ -1,0 +1,150 @@
+/* Section 6 · #clients (design-spec §5.6; revision 1 §1.5). Owner: sections-2. Unlayered: beats the shared layers.
+   Head (eyebrow, h2, lead) → the segmented control (one .cells row of five 56-px segments) sharing its bottom
+   line with the panel (.cells: blue question cell 7/12 | light cell 5/12, equal heights) → "Talk to us".
+   Below 1024 the control scrolls sideways with snap points and the panel's cells stack. */
+
+.clients {
+  padding-block: var(--sec-pad-top) var(--seam);
+}
+
+/* ---- head ------------------------------------------------------------------------------------- */
+.clients__head .h2 { max-width: var(--measure-h2); margin-top: var(--sp-16); }
+.clients__head .lead { max-width: var(--measure-lead); margin-top: var(--sp-24); }
+.clients__body { margin-top: var(--seam); }
+
+/* ---- the segmented control --------------------------------------------------------------------- */
+.clients__seg {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.clients__tab {
+  position: relative;
+  display: flex;
+  align-items: center;                     /* 56 − 20 and 56 − 24 are even: icon and label on whole px */
+  gap: var(--sp-12);
+  min-width: 0;
+  height: 56px;
+  padding: 0 var(--sp-16);
+  background: var(--paper);
+  color: var(--text-muted);
+  text-align: left;
+  transition: background-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui);
+}
+.clients__tab:hover { color: var(--text); }
+.clients__tab[aria-selected="true"] {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: inset 0 2px 0 var(--blue);   /* the 2-px bar along the top edge */
+}
+.clients__tab:focus-visible { outline-offset: -4px; }
+.clients__tab-icon { display: block; flex: none; line-height: 0; }
+.clients__tab-icon .icon { display: block; }
+.clients__tab[aria-selected="true"] .clients__tab-icon { color: var(--blue); }
+.clients__tab-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---- the panel ---------------------------------------------------------------------------------- */
+.clients__panel {
+  /* whole-pixel columns, so the sprite and the eyebrows land on the device grid */
+  --q: round(down, calc((100% - 1px) * 7 / 12), 1px);
+  grid-template-columns: var(--q) minmax(0, 1fr);
+  align-items: stretch;
+}
+.clients__panel:focus-visible { outline-offset: 2px; }
+
+/* the question cell: eyebrow, the question (h3 on colour, 44/48 at lg), the audience sprite bottom-right */
+.clients__q {
+  position: relative;
+  min-height: 320px;
+  padding: var(--sp-40);
+  background: var(--ramp-3);
+  color: var(--on-dark);
+}
+.clients__q > .eyebrow { color: var(--on-dark); }
+.clients__q-text { margin-top: var(--sp-16); padding-right: calc(192px + var(--sp-24)); }
+.clients__question {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 44px;
+  line-height: 48px;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.clients__sprite {
+  position: absolute;
+  right: var(--sp-40);
+  bottom: var(--sp-40);
+  width: 192px;
+  height: 192px;
+  line-height: 0;
+}
+.clients__sprite > .px { display: block; }
+
+/* the light cell: two blocks, the first eyebrow on the question cell's eyebrow line */
+.clients__detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-40);
+  padding: var(--sp-40);
+  background: var(--card);
+}
+.clients__block { display: flex; flex-direction: column; gap: var(--sp-16); }
+.clients__cert { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-16); color: var(--text-soft); }
+
+/* every audience's copy shares one grid cell: the cell sizes to the longest copy and never moves;
+   switching cross-fades the text wrappers only (150 ms), backgrounds stay put */
+.clients__layers { display: grid; }
+.clients__layer {
+  grid-area: 1 / 1;
+  min-width: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur-ui) var(--ease-ui), visibility 0s linear var(--dur-ui);
+}
+.clients__layer.is-active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--dur-ui) var(--ease-ui), visibility 0s;
+}
+:root[data-motion="reduced"] .clients__layer { transition: none; }
+
+.clients__talk { margin-top: var(--sp-24); }
+
+/* ---- 1024–1279: the question steps down to the lg h3 so the narrower 7/12 cell keeps 3 lines ---- */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .clients__question { font-size: var(--fs-h3); line-height: var(--lh-h3); }
+  /* final validation: the five labels need up to 169 px but get 124 (1024) to 167 (1240), so all five ended in "…";
+     a label that does not fit now takes a second line inside the 56-px segment instead */
+  .clients__tab-label { overflow: visible; white-space: normal; text-overflow: clip; line-height: 20px; text-wrap: balance; }
+}
+
+/* ---- below 1024: a sideways control, stacked cells -------------------------------------------- */
+@media (max-width: 1023.98px) {
+  .clients__seg {
+    grid-template-columns: repeat(5, max-content);      /* each segment as wide as its label (≥ 200), never clipped */
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .clients__seg::-webkit-scrollbar { display: none; }
+  .clients__tab { min-width: 200px; padding-right: var(--sp-24); scroll-snap-align: start; }
+  .clients__tab-label { overflow: visible; }
+  .clients__panel { grid-template-columns: minmax(0, 1fr); }
+  .clients__q { min-height: 0; padding: var(--sp-24); }
+  .clients__q-text { min-height: 192px; }
+  .clients__question { font-size: var(--fs-h3); line-height: var(--lh-h3); }
+  .clients__sprite { right: var(--sp-24); bottom: var(--sp-24); }
+  .clients__detail { flex-direction: row; gap: var(--sp-24); padding: var(--sp-24); }
+  .clients__block { flex: 1 1 0; min-width: 0; }
+}
+@media (max-width: 767.98px) {
+  .clients__q { padding: var(--sp-16); }
+  .clients__q-text { padding-right: 0; min-height: 0; }
+  .clients__sprite { position: relative; right: auto; bottom: auto; display: block; margin: var(--sp-24) 0 0 auto; }
+  .clients__detail { flex-direction: column; padding: var(--sp-16); }
+}
+
+/* ---- forced colours: the selected segment keeps a visible marker (box-shadows are dropped) ------ */
+@media (forced-colors: active) {
+  .clients__tab[aria-selected="true"] { border-top: 2px solid Highlight; }
+  .clients__layer { transition: none; }
+}

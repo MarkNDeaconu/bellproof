@@ -1,0 +1,94 @@
+/* Flip · design-spec §5.3 as amended by revision-1 §1.3. Owner: sections-1.
+   A. 7/12 + 5/12 head + fridge-out cell · B. running example (question cell + two stacked cards) · D. the paradox band. */
+
+.flip { padding: var(--sec-pad-top) 0 0; }
+@media (min-width: 1024px) { .flip { padding-top: 120px; } }
+
+/* ---- A ------------------------------------------------------------------------------------------- */
+.flip__top { align-items: stretch; }
+.flip__head { display: flex; flex-direction: column; align-items: flex-start; }
+.flip__h2 { margin-top: var(--sp-16); }
+.flip__lead { margin-top: var(--sp-24); }
+.flip__fig-wrap { display: flex; }
+.flip__fig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-16);
+  flex: 1;
+  min-height: 320px;
+  margin: 0;
+  padding: var(--sp-24);
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+.flip__fridge { display: block; }
+.flip__fig-tag { display: block; line-height: 0; }
+.flip__fig-tag .tag-illustrative { margin: 0; line-height: var(--lh-micro); }
+
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  .flip__head { grid-column: span 8; }            /* 8/4 here: the h2 keeps 3 lines; the 192 px sprite still fits */
+  .flip__fig-wrap { grid-column: span 4; }
+}
+
+/* ---- B · running example ---------------------------------------------------------------------------
+   ≥ 1200: question cell (2 rows tall) + two stacked cards. Below 1200 everything stacks in one column, so a 72 px formula
+   always has room (qa-layout #9). Formulas never wrap. */
+.flip__example { margin-top: var(--seam); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1200px) {
+  .flip__example { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto auto; }
+  .flip__q { grid-row: span 2; }
+}
+.flip__q-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-8) var(--sp-16); }
+.flip__question { margin-top: -4px; max-width: 30ch; }
+.flip__why { margin-top: var(--sp-16); }
+.flip__why + .cell__body { margin-top: -8px; max-width: var(--measure-body); }
+@media (min-width: 1200px) {
+  .flip__why { margin-top: auto; padding-top: var(--sp-24); }   /* question on top, "Why quantum" level with the dark card's copy */
+}
+.flip__card { gap: var(--sp-12); }
+.flip__num { margin-top: var(--sp-8); white-space: nowrap; }
+.flip__num sup {
+  font-size: .5em;
+  line-height: 0;
+  vertical-align: .6em;
+  letter-spacing: -.05em;
+}
+.flip__card .tag-illustrative { margin-left: 0; vertical-align: 1px; }
+
+/* ---- D · the paradox band ----------------------------------------------------------------------------
+   The bands helper puts an M-wide rail stage at each band edge, anchored to the band's bottom (B1): left 2M tall,
+   right 1.5M + the 64 px `?` block. At lg the copy starts on the rail line (content-left + M) and ends M before the
+   content's right edge, so neither stack is ever under text (a11y #19). Below 1024 the stacks sit under the copy. */
+.paradox { position: relative; overflow: hidden; margin-top: var(--seam); padding: var(--sp-80) 0 208px; }
+.paradox__stage { position: absolute; inset: 0; z-index: 0; }
+#paradox > .bands-gridlines { z-index: 0; }        /* under the stacks and the copy (the stage follows it in the DOM) */
+/* integrator R2: the grid is built on the viewport (flip.ts), so lines 1 and 4 are the viewport edges: keep only the rails */
+#paradox > .bands-gridlines > .bands-gridlines__v:is(:nth-child(1), :nth-child(4)) { display: none; }
+.paradox__wrap { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; }
+.paradox__statement { max-width: 1000px; margin-top: var(--sp-16); }
+.paradox__sub { margin-top: var(--sp-32); }
+.paradox__fallback { position: absolute; right: var(--module); bottom: 0; }
+
+/* the helper's rail module (railModuleFor): 128 from 1440, 96 from 1200, 64 below. From 1024 the copy is inset by one rail
+   on both sides of the content box, so it always starts ≥ 40 px right of the left stack and ends ≥ 40 px left of the right
+   one; below 1024 the band reserves the stacks' height under the copy instead. */
+@media (min-width: 1024px) {
+  .paradox { --para-rail: 64px; padding: 96px 0; }
+  .paradox__wrap { padding-inline: var(--para-rail); }
+  .paradox__statement { max-width: none; font-size: 56px; line-height: 60px; }
+}
+@media (min-width: 1200px) { .paradox { --para-rail: 96px; } }
+@media (min-width: 1280px) {
+  .paradox__statement { font-size: 72px; line-height: 72px; }
+}
+@media (min-width: 1440px) { .paradox { --para-rail: 128px; } }
+
+/* integrator R2: below 1024 the copy starts at the gutter, above the stacks: any vertical would cross the headline */
+@media (max-width: 1023.98px) { #paradox > .bands-gridlines { display: none; } }
+
+@media (max-width: 767.98px) {
+  .flip__fig { min-height: 0; padding: var(--sp-32) var(--sp-16); }
+  .paradox { padding: var(--sp-64) 0 192px; }
+}

@@ -1,0 +1,45 @@
+/* Pixel-step hovers for inline icon SVGs (icon(), iconHTML(), [data-icon]). Owner: art-icons.
+   Opt in by putting data-hop="…" on the hover target (button, link, cell, tab); its .icon reacts.
+   Every move is a whole art pixel: inside an icon SVG one user unit is one art px, so translate(1px)
+   moves exactly one art px at any icon size (2/4/8/20). Timing is in 83 ms sprite ticks with steps(),
+   so nothing ever renders between pixels. Hover-in and hover-out both step; focus-visible = hover.
+
+   data-hop="step"   chevron / arrow: two 1-px steps right (0 ms, 83 ms); steps back on leave.
+                     (design-spec §4.2 "pixel step", expressed per art px instead of per 4 CSS px)
+   data-hop="hop"    chevron / arrow, playful: a tiny jump: up-right, then right, then lands.
+   data-hop="out"    external ↗: nudges 1 px up-right for 2 ticks, then settles back.
+   data-hop="drop"   caret ⌄: dips 1 px for 2 ticks.
+   data-hop="press"  play ▶: presses 1 px down for 2 ticks.                                         */
+
+[data-hop] .icon { overflow: visible; }
+[data-hop] .icon rect { transform: translate(0, 0); }
+
+/* step: transition both ways */
+[data-hop="step"] .icon rect { transition: transform 166ms steps(2, jump-start); }
+[data-hop="step"]:is(:hover, :focus-visible) .icon rect { transform: translate(2px, 0); }
+
+/* hop: one-shot keyframes on enter (3 ticks), transition on leave */
+@keyframes bp-icon-hop {
+  0%   { transform: translate(1px, -1px); }
+  33%  { transform: translate(2px, -1px); }
+  66%, 100% { transform: translate(2px, 0); }
+}
+[data-hop="hop"] .icon rect { transition: transform 166ms steps(2, jump-start); }
+[data-hop="hop"]:is(:hover, :focus-visible) .icon rect {
+  transform: translate(2px, 0);
+  animation: bp-icon-hop 250ms steps(1, jump-end) backwards;   /* not `both`: a held fill would mask the step-back transition on leave */
+}
+
+/* out / drop / press: 2-tick gestures that return to rest */
+@keyframes bp-icon-out   { 0%, 99.9% { transform: translate(1px, -1px); } 100% { transform: translate(0, 0); } }
+@keyframes bp-icon-drop  { 0%, 99.9% { transform: translate(0, 1px); }  100% { transform: translate(0, 0); } }
+@keyframes bp-icon-press { 0%, 99.9% { transform: translate(0, 1px); }  100% { transform: translate(0, 0); } }
+[data-hop="out"]:is(:hover, :focus-visible) .icon rect   { animation: bp-icon-out 166ms steps(1, jump-end) both; }
+[data-hop="drop"]:is(:hover, :focus-visible) .icon rect  { animation: bp-icon-drop 166ms steps(1, jump-end) both; }
+[data-hop="press"]:is(:hover, :focus-visible) .icon rect { animation: bp-icon-press 166ms steps(1, jump-end) both; }
+
+/* reduced motion: no movement at all (the colour/background hover of the host still applies) */
+@media (prefers-reduced-motion: reduce) {
+  [data-hop] .icon rect { transition: none !important; animation: none !important; transform: none !important; }
+}
+:root[data-motion="reduced"] [data-hop] .icon rect { transition: none !important; animation: none !important; transform: none !important; }

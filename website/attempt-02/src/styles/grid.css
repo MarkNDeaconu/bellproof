@@ -1,0 +1,241 @@
+/* Grid, hairlines and dots · design-spec §3. Owner: layout-core.
+   .wrap (content box) · .sec + tints (seams are lines) · .cells/.cell (lines are shared, never doubled)
+   · .rail · .dot · .grid-colour (grid on colour) · layout helpers · the skeleton shells. */
+
+@layer bp.grid {
+/* ---- 3.1 content box: x = 40 → 1400 at 1440; 16px gutter below 1024; capped at 1728 -------- */
+.wrap {
+  width: min(100% - 2 * var(--gutter), var(--content-max));
+  margin-inline: auto;
+}
+.wrap--lined { border-inline: 1px solid var(--line); }   /* the content edge is itself a grid line */
+.bleed { width: 100%; }
+
+/* ---- sections: every section starts with a 1px seam and paints its tint (design §5) -------- */
+.sec {
+  position: relative;
+  background: var(--surface);
+  color: var(--text);
+  border-top: 1px solid var(--line);
+}
+main > .sec:first-child { border-top: 0; }               /* the nav's bottom hairline is the seam */
+
+[data-tint="card"]  { --surface: var(--card);   --surface-2: var(--paper); }
+[data-tint="paper"] { --surface: var(--paper);  --surface-2: var(--paper-2); }
+/* ink and blue re-map every role in tokens.css; their surfaces come from there */
+
+/* a band inside a section (paradox, CTA): full-bleed, its own tint, a seam on top */
+.band { position: relative; background: var(--surface); border-top: 1px solid var(--line); }
+
+/* ---- 3.3.1 cells: a grid whose 1px gaps show the hairline; each cell paints its own surface ----
+   Columns per breakpoint: --cols-sm (default 1), --cols-md, --cols-lg (each falls back to the
+   smaller one). Fill every row: an empty grid area shows the hairline colour. */
+.cells {
+  display: grid;
+  grid-template-columns: repeat(var(--cols-sm, 1), minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+@media (min-width: 768px) {
+  .cells { grid-template-columns: repeat(var(--cols-md, var(--cols-sm, 1)), minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .cells { grid-template-columns: repeat(var(--cols-lg, var(--cols-md, var(--cols-sm, 1))), minmax(0, 1fr)); }
+}
+.cells--2 { --cols-md: 2; }
+.cells--3 { --cols-lg: 3; }
+.cells--4 { --cols-md: 2; --cols-lg: 4; }
+.cells--6 { --cols-sm: 2; --cols-md: 3; --cols-lg: 6; }
+.cells + .cells { border-top: 0; }                       /* stacked rows share one line */
+.cells--flush { border-inline: 0; }                      /* full-bleed rows: no lines at the page edge */
+.cells--open { border: 0; }
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+  min-width: 0;
+  padding: var(--cell-pad);
+  background: var(--cell-bg);
+  color: var(--text);
+}
+.cell--paper   { --cell-bg: var(--paper); }
+.cell--paper-2 { --cell-bg: var(--paper-2); }
+.cell--card    { --cell-bg: var(--card); }
+.cell.on-dark, .cell.on-blue, .cell.on-light { background: var(--cell-bg); }
+.cell--span    { grid-column: 1 / -1; }
+.cell__foot    { margin-top: auto; }                     /* tag or button pinned to the bottom */
+.cell__body    { color: var(--text-soft); }
+
+/* cells that are a link as a whole (design §4.4): hover lifts to paper */
+.cell--link { transition: background-color var(--dur-ui) var(--ease-ui); }
+.cell--link:hover { background: var(--cell-hover); }
+a.cell--link:focus-visible { outline-offset: -4px; }
+
+/* ---- 3.3.3 rails: M wide, drawn by a 1px line on the inner edge ----------------------------- */
+.rail { position: relative; flex: none; width: var(--module); }
+.rail--left  { border-right: 1px solid var(--line); }
+.rail--right { border-left: 1px solid var(--line); }
+
+/* ---- 3.3.4 registration dots: 4×4 ink squares centred on a line ----------------------------
+   Position with --x / --y (the line's coordinates); the dot centres itself on that point. */
+.dot {
+  position: absolute;
+  left: var(--x, 0);
+  top: var(--y, 0);
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  background: var(--dot);
+  pointer-events: none;
+}
+
+/* ---- 3.3.6 grid on colour, revised (revision-1 §1.8, LC8): our module grid, not the 48/80 lattice.
+   Verticals at the content-box edges and at the two rail lines (content-left + M, content-right − M); no
+   horizontals on a plain band (the footer strata adds its band seams itself). Lines share the content box's
+   own columns, so nothing doubles at 40/48. The image is a token so other overlays can reuse it; it is declared
+   on the elements so a scope can re-colour --grid-on-colour. */
+:where(.grid-colour) {
+  --gc-edge: max(var(--gutter), (100% - var(--content-max)) / 2);
+  --gc-m: 128px;               /* integrator R2 (queue #18): the hero's rail rule, 128 / 96 / 64 (≥ 1440 / 1200–1439 / < 1200), */
+  --grid-colour-image:
+    linear-gradient(var(--grid-on-colour), var(--grid-on-colour)) var(--gc-edge) 0 / 1px 100% no-repeat,
+    linear-gradient(var(--grid-on-colour), var(--grid-on-colour)) calc(100% - var(--gc-edge)) 0 / 1px 100% no-repeat,
+    linear-gradient(var(--grid-on-colour), var(--grid-on-colour)) calc(var(--gc-edge) + var(--gc-m)) 0 / 1px 100% no-repeat,
+    linear-gradient(var(--grid-on-colour), var(--grid-on-colour)) calc(100% - var(--gc-edge) - var(--gc-m)) 0 / 1px 100% no-repeat;
+}
+/* … the same module the footer strata uses for its rail lines, so the CTA band's verticals continue into the footer */
+@media (max-width: 1439.98px) { :where(.grid-colour) { --gc-m: 96px; } }
+@media (max-width: 1199.98px) { :where(.grid-colour) { --gc-m: 64px; } }
+.grid-colour { position: relative; isolation: isolate; }
+.grid-colour::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--grid-colour-image);
+}
+/* on ink the 10%-ink grid would vanish: draw it in 6% paper instead */
+.on-dark.grid-colour, [data-tint="ink"].grid-colour { --grid-on-colour: rgba(244, 242, 237, .06); }
+
+/* ---- layout helpers ------------------------------------------------------------------------ */
+/* 1/4 + 3/4 split (the x = 380 line at 1440 that recurs: sticky tabs, client tabs) */
+.split { display: grid; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1024px) { .split { grid-template-columns: 340px minmax(0, 1fr); } }
+
+/* 12-column grid for 7/5 and 6/6 splits at lg; stacks below */
+.grid-12 { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-40); }
+@media (min-width: 1024px) {
+  .grid-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .span-4 { grid-column: span 4; } .span-5 { grid-column: span 5; } .span-6 { grid-column: span 6; }
+  .span-7 { grid-column: span 7; } .span-8 { grid-column: span 8; } .span-12 { grid-column: 1 / -1; }
+}
+
+/* vertical rhythm */
+.stack > * + * { margin-top: var(--stack, var(--sp-16)); }
+.seam-top { margin-top: var(--seam); }
+.pad-top  { padding-top: var(--sec-pad-top); }
+.pad-seam { padding-bottom: var(--seam); }
+
+/* ---- skeleton shells (layout-core) ---------------------------------------------------------
+   The page reads top to bottom before the section agents land. Each section agent owns everything
+   inside its <section> and may drop these classes; nothing outside the shell depends on them. */
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--seam);
+  padding-block: var(--sec-pad-top) var(--seam);
+}
+.shell__head { display: flex; flex-direction: column; align-items: flex-start; }
+.shell__head > .eyebrow { margin-bottom: var(--sp-16); }
+.shell__head > .h2,
+.shell__head > .display { max-width: var(--measure-h2); }
+.shell__head > .lead { max-width: var(--measure-lead); margin-top: var(--sp-24); }
+.shell__head--center { align-items: center; text-align: center; }
+.shell__head--row { flex-direction: column; gap: var(--sp-24); }
+@media (min-width: 1024px) {
+  .shell__head--row { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+}
+.shell__stage {
+  display: grid;
+  place-items: center;
+  min-height: 320px;
+}
+@media (max-width: 767.98px) { .shell__stage { min-height: 240px; } }
+.shell__sub { display: flex; flex-direction: column; gap: var(--sp-24); padding-top: var(--seam); border-top: 1px solid var(--line); }
+
+/* hero shell: rails + arc + text, then the research strip (design §5.1 geometry, simplified) */
+.hero-shell {
+  position: relative;
+  display: flex;
+  min-height: max(800px, calc(100dvh - 160px));
+  overflow: hidden;
+}
+.hero-shell__main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 384px;
+}
+.hero-shell__text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 800px;
+  padding: 80px 40px 40px;
+}
+.hero-shell__text > .display { max-width: 760px; }
+.hero-shell__text > .lead { max-width: var(--measure-body); margin-top: var(--sp-24); }
+.hero-shell__text > .btn-row { margin-top: var(--sp-32); }
+.hero-shell__text > .hero-shell__ticker { margin-top: var(--sp-24); }
+.hero-shell__text > .pill { margin-bottom: var(--sp-24); }   /* revision §1.1.8: above the H1 */
+.hero-shell__fridge { display: flex; justify-content: center; align-items: flex-start; }
+@media (max-width: 1023.98px) {
+  .hero-shell { min-height: 0; }
+  .hero-shell .rail--right { display: none; }
+  .hero-shell__main { grid-template-columns: minmax(0, 1fr) 288px; }
+  .hero-shell__text { padding: 80px 24px 40px; }
+}
+@media (max-width: 767.98px) {
+  .hero-shell .rail { display: none; }
+  .hero-shell__main { grid-template-columns: minmax(0, 1fr); }
+  .hero-shell__text { padding: 64px var(--gutter) 24px; }
+  .hero-shell__fridge { height: 240px; border-block: 1px solid var(--line); align-items: center; }
+}
+
+/* research strip: label cell + 5 citation cells, M tall (design §5.1) */
+.strip { grid-template-columns: repeat(6, minmax(0, 1fr)); border-bottom-width: 1px; }
+.strip > .cell { min-height: var(--module); padding: var(--sp-24); gap: var(--sp-4); }
+.strip__label { justify-content: center; }
+.strip__cite { padding-right: 48px; }
+.strip__glyph { position: absolute; right: var(--sp-24); bottom: var(--sp-24); display: flex; color: var(--text-soft); }
+@media (max-width: 1023.98px) {
+  .strip > .cell { min-height: 112px; padding: var(--sp-16); }
+  .strip__glyph { right: var(--sp-16); bottom: var(--sp-16); }
+  .strip__label { grid-column: 1 / -1; min-height: 64px !important; }
+  .strip__cite { grid-column: span 2; }
+  .strip__cite:nth-child(5), .strip__cite:nth-child(6) { grid-column: span 3; }
+}
+@media (max-width: 767.98px) {
+  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .strip__cite, .strip__cite:nth-child(5) { grid-column: span 1; }
+  .strip__cite:nth-child(6) { grid-column: 1 / -1; }
+}
+
+/* paradox band and CTA band shells */
+.shell--band { padding-block: var(--sp-128); }
+.shell__statement { max-width: 1000px; }
+@media (max-width: 1023.98px) { .shell--band { padding-block: var(--sp-80); } }
+.shell--cta { padding-block: var(--sp-80); }
+.shell__cta-cell { flex-direction: row; align-items: flex-start; gap: var(--sp-24); min-height: 160px; padding-right: 56px; }
+.shell__cta-copy { display: flex; flex-direction: column; gap: var(--sp-8); }
+.shell__cta-glyph { position: absolute; right: var(--sp-24); bottom: var(--sp-24); display: flex; color: var(--text-soft); }
+.on-dark .cell--link:hover, [data-tint="ink"] .cell--link:hover { background: var(--ghost-on-dark); }
+.shell__cta-final { display: flex; justify-content: center; }
+.shell__lead { margin-top: var(--sp-24); }
+
+} /* @layer bp.grid */

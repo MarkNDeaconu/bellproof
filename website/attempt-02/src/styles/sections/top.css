@@ -1,0 +1,314 @@
+/* Hero · revision 1 §1.1 (amends design-spec §5.1). Owner: sections-1.
+   One frame per geometry rule (revision 1 §1.1):
+     ≥ 1440     [rail 128][text 1fr][fridge cell 384][rail 128]   H1 88/88, sphere 64 px
+     1200–1439  [rail  96][text 1fr][fridge cell 320][rail  96]   H1 72/72, sphere 64 px
+     < 1200     text block, then a 480 px fridge cell (512 below 768) holding the stage; H1 64/64 in 3 lines, 40/44 in 4
+                below 768, sphere `sm` (44 px)
+   The bands stage (`.hero__stage`) is the frame's floor: its rails stand on the frame bottom, which is the strip's top
+   line. The frame height is a multiple of 8, so every block lands on the band grid.
+   Then the research strip (6 cells ≥ 1200, 3 + 3 at 768–1199, 2 columns below).
+   Intro: the final state is the default; intro states apply ONLY under html.intro (head script, LC2). */
+
+/* ---- first paint: layout-core's shell in index.html ------------------------------------------------------------
+   Without html.intro (no JS, hidden tab, reduced motion, paused) it is visible and laid out like the hero; top.ts swaps
+   it for the live hero in the boot task. Under html.intro it waits for top.ts; if the module never mounts, a CSS
+   fail-safe shows it after 2.5 s, so the hero can never sit blank. */
+html.intro .hero-shell__text,
+html.intro .hero-shell__fridge { visibility: hidden; animation: hero-failsafe 1ms 2.5s both; }
+@keyframes hero-failsafe { to { visibility: visible; } }
+.hero-shell { min-height: 800px; min-height: round(down, clamp(672px, 100svh - 72px, 920px), 8px); }   /* integrator R2: the live frame's rule */
+@media (min-width: 1440px) { .hero-shell { min-height: round(down, clamp(720px, 100svh - 72px, 920px), 8px); } }
+.hero-shell > .rail { width: 128px; }
+.hero-shell__text { max-width: none; padding: 64px 24px 80px 40px; }
+.hero-shell__text > .display { white-space: normal; }
+#top .strip { border-bottom: 0; }
+#top .strip__cite > .mono { white-space: nowrap; }
+#top .strip__cite > .micro { text-transform: none; letter-spacing: 0.02em; }
+#top .strip__cite { padding-right: var(--sp-24); }
+@media (max-width: 1439.98px) {
+  .hero-shell > .rail { width: 96px; }
+  .hero-shell__main { grid-template-columns: minmax(0, 1fr) 320px; }
+  .hero-shell__text { padding-bottom: 64px; }
+  .hero-shell__text > .display { font-size: 72px; line-height: 72px; }
+}
+@media (min-width: 1200px) and (max-width: 1439.98px) {
+  #top .strip { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr); }
+}
+@media (max-width: 1199.98px) {
+  .hero-shell { display: block; min-height: 0; }
+  .hero-shell > .rail { display: none; }
+  .hero-shell__main { display: block; }
+  .hero-shell__text { padding: 80px 64px 64px; }
+  .hero-shell__text > .display { font-size: 64px; line-height: 64px; }
+  .hero-shell__fridge { height: 480px; border-top: 1px solid var(--line); }
+  #top .strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #top .strip > .cell { min-height: 112px !important; grid-column: auto; }
+}
+@media (max-width: 767.98px) {
+  .hero-shell__text { padding: 64px var(--gutter) 40px; }
+  .hero-shell__text > .display { font-size: 40px; line-height: 44px; }
+  .hero-shell__fridge { height: 512px; }
+  #top .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #top .strip > .strip__label, #top .strip > .strip__cite:last-child { grid-column: 1 / -1; }
+  #top .strip > .strip__label { min-height: 64px !important; }
+}
+
+/* ---- geometry ----------------------------------------------------------------------------------------------- */
+#top {
+  --hm: 128px;                  /* rail module M */
+  --hcell: 384px;               /* fridge cell */
+  --fx: 80px;                   /* the fridge canvas's left edge inside its cell (224 wide; centred in 384) */
+}
+@media (max-width: 1439.98px) { #top { --hm: 96px; --hcell: 320px; } }   /* lg-narrow: same 80 px offset, 16 from the rail */
+@media (max-width: 1199.98px) { #top { --hm: 64px; } }
+
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--hm) minmax(0, 1fr) var(--hcell) var(--hm);
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 800px;
+  /* integrator R2 (user requests: first "cut off on a laptop", then "a bit too short"): the frame follows the small
+     viewport under the 48 px nav with the research strip peeking ~24 px (100svh − 72), between 672 and 920 at
+     1200–1439 (672 = 720 − 48: a 1280×720 screen shows the whole floor) and 720–920 from 1440, on the 8 px grid.
+     1440×800 → 728, 1440×900 → 824, 1920×1080 → 920. The copy needs ≤ 710 (64 + copy + M/2 + 16, with the short-
+     screen spacing below 880 px tall), and the 512 px fridge and its labels fit at every height. */
+  min-height: round(down, clamp(672px, 100svh - 72px, 920px), 8px);
+  overflow: hidden;             /* the rails slide in from outside the frame */
+}
+@media (min-width: 1440px) { .hero { min-height: round(down, clamp(720px, 100svh - 72px, 920px), 8px); } }
+
+/* rails: M wide, a 1px line on the inner edge (the bands dots sit on it at each stack top) */
+.hero__rail { position: relative; z-index: 0; grid-row: 1; transition: opacity 300ms linear; }
+.hero__rail--l { grid-column: 1; box-shadow: inset -1px 0 var(--line); }
+.hero__rail--r { grid-column: 4; box-shadow: inset 1px 0 var(--line); }
+
+/* the bands stage: the whole frame (rails at its edges, pair and certificate on its floor) */
+.hero__stage { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+
+/* ---- text column: ends ≥ M/2 + 16 above the floor (the pair stands there) ------------------------------------ */
+.hero__text {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  min-width: 0;
+  padding: 64px 24px calc(var(--hm) / 2 + 16px) 40px;
+}
+.hero__copy { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; max-width: 760px; }
+
+.hero__pillwrap { display: flex; max-width: 100%; margin-bottom: var(--sp-24); }
+.hero__pill { max-width: 100%; }
+.hero__pill .pill__label { white-space: nowrap; }
+
+/* the headline: explicit lines, never wrapped, so it is 3 lines (4 below 768) at every width */
+.hero__h1 { margin: 0; white-space: nowrap; }
+.hero__lines { display: flex; flex-direction: column; align-items: flex-start; }   /* flex: the masks' margins never collapse */
+.hero__lines--four { display: none; }
+.hero__line {
+  display: block;
+  overflow: hidden;
+  /* the mask has room for ascenders, descenders and the sphere; pulled back so each line box stays one line-height */
+  padding: 16px 0.12em 0.18em 0.06em;
+  margin: -16px -0.12em -0.18em -0.06em;
+}
+.hero__line-in { display: block; }
+
+/* the sphere is the full stop: on the baseline where the period was. The negative top margin keeps the 64 px canvas
+   from growing a 72 px (or 44 px) line box; it paints into the mask's 16 px headroom. */
+.hero__stop { display: inline-block; vertical-align: baseline; margin: -24px 0 0 calc(0.06em - 8px); line-height: 0; }   /* the orb starts 2 art px in */
+.hero__stop > .px { display: block; }
+.hero__stop--sm { display: none; }
+
+.hero__lead { max-width: var(--measure-body); margin-top: var(--sp-24); color: var(--text-soft); }
+.hero__btns { margin-top: var(--sp-32); }
+
+/* integrator R2: on short laptop screens the copy's inner spacing tightens one step (pill 24 → 16, lead 24 → 16,
+   buttons 32 → 24, ticker 24 → 16: −32 px) so the frame can follow the viewport down to its floor */
+@media (min-width: 1200px) and (max-height: 880px) {
+  .hero-shell__text > .pill { margin-bottom: var(--sp-16); }
+  .hero-shell__text > .lead { margin-top: var(--sp-16); }
+  .hero-shell__text > .btn-row { margin-top: var(--sp-24); }
+  .hero-shell__text > .hero-shell__ticker { margin-top: var(--sp-16); }
+  .hero__pillwrap { margin-bottom: var(--sp-16); }
+  .hero__lead { margin-top: var(--sp-16); }
+  .hero__btns { margin-top: var(--sp-24); }
+  .hero__ticker { margin-top: var(--sp-16); }
+}
+
+/* ---- ticker: the final box is laid out from the first frame (untyped characters are hidden, not absent) ----- */
+.hero__ticker { position: relative; margin-top: var(--sp-24); font-variant-ligatures: none; }
+.hero__tk--seg { white-space: nowrap; }
+.hero__tk--last { display: inline-block; white-space: nowrap; color: var(--text); font-weight: 500; }
+.hero__ch { position: relative; }
+.hero__ch.is-off { visibility: hidden; }
+.hero__ch--end { display: inline-block; width: 11px; height: 1px; }    /* the cursor's slot after the last word */
+/* the 8 × 20 block cursor covers the next character's cell while typing, then sits in the end slot (2 px in) */
+.hero__ch.is-caret::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -10px;            /* centred on the glyph box = the 20 px line */
+  width: 8px;
+  height: 20px;
+  background: currentColor;
+  visibility: visible;
+}
+.hero__ch--end.is-caret::before { left: 3px; top: auto; bottom: -5px; margin-top: 0; }   /* the slot is 1 px on the baseline */
+/* typed: hold 2 s, blink 3 cycles (stepped), then stay on. No JS. */
+.hero__ticker.is-typed:not(.is-still) .hero__ch.is-caret::before { animation: bp-blink 1s steps(2, jump-none) 2s 3; }
+.hero__ticker.is-waiting .hero__ch.is-caret::before { visibility: hidden; }
+/* the cooldown readout counts down in the ticker slot before typing starts */
+.hero__readout { position: absolute; left: 0; top: 0; white-space: nowrap; visibility: hidden; }
+.hero__ticker.is-readout .hero__readout { visibility: visible; }
+
+/* ---- fridge cell ---------------------------------------------------------------------------------------------- */
+.hero__cell { grid-column: 3; grid-row: 1; position: relative; z-index: 2; min-width: 0; }
+.hero__fig { position: absolute; top: 0; left: var(--fx); margin: 0; line-height: 0; }
+.hero__labels {
+  position: absolute;
+  inset: 0;
+  z-index: 3;                   /* above the stage (a11y #3) */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+/* each label is centred on its plate's label row (art px row × 4); the leader lands on the row's middle */
+.hero__label {
+  position: absolute;
+  left: 0;
+  top: calc(var(--row) * 4px - 8px);
+  width: calc(var(--fx) + var(--pl) * 4px - 4px);       /* ends 4 px before the plate's left edge */
+  height: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: 20px;
+  white-space: nowrap;
+  transition: opacity 166ms steps(2, jump-end);
+}
+.hero__label-text { padding-inline: 4px; background: var(--card); }
+.hero__leader {
+  flex: none;
+  width: calc(var(--pl) * 4px + 4px);
+  height: 1px;
+  margin: 10px 0 0 4px;
+  background: repeating-linear-gradient(to right, var(--hairline-strong) 0 4px, transparent 4px 8px);
+}
+.hero__bit {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--px-azure);
+  pointer-events: none;
+  z-index: 3;
+}
+.hero__spark {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  z-index: 3;
+  --c: var(--px-white);
+  background:
+    linear-gradient(var(--c), var(--c)) 4px 0 / 4px 12px no-repeat,
+    linear-gradient(var(--c), var(--c)) 0 4px / 12px 4px no-repeat;
+}
+.hero__spark.is-2 { --c: var(--px-azure); }
+
+/* ---- research strip ------------------------------------------------------------------------------------------- */
+.hero-strip { grid-template-columns: repeat(6, minmax(0, 1fr)); border-bottom: 0; }   /* the trust seam draws the line */
+.hero-strip > .cell { min-height: 128px; padding: var(--sp-24); gap: var(--sp-4); }
+.hero-strip__label { justify-content: center; }
+.hero-strip__name { white-space: nowrap; }
+.hero-strip__venue { text-transform: none; letter-spacing: 0.02em; }
+.hero-strip__glyph { position: absolute; right: var(--sp-24); bottom: var(--sp-24); display: flex; color: var(--text-soft); }
+
+/* ============================================================ intro states (only under html.intro) */
+html.intro #top:not(.is-go) .hero__rail { opacity: 0; }
+html.intro #top.is-pre-intro .hero__stage { visibility: hidden; }        /* blocks wait off-stage until intro() */
+html.intro #top:not(.is-text) .hero__line-in { transform: translateY(calc(100% + 24px)); }   /* clears the mask, sphere included */
+html.intro #top:not(.is-text) .hero__rise { clip-path: inset(0 0 100% 0); transform: translateY(16px); }
+html.intro #top .hero__label:not(.in) { opacity: 0; }
+html.intro #top .hero__ticker.is-waiting .hero__tag { visibility: hidden; }
+/* CSS fail-safe for the stage (no transition there): if intro() never runs, the blocks show at 2.5 s anyway. The text,
+   rails and labels rely on the JS fail-safe (1.5 s) and on mount's try/catch, which drops html.intro on any error: a
+   CSS animation on a transitioned property would cancel its transition. */
+@keyframes hero-show { to { visibility: visible; } }
+html.intro #top.is-pre-intro .hero__stage { animation: hero-show 1ms 2.5s both; }
+
+/* text beats, timed from `is-text` (t = 200 ms): lines +0/120/240/360, pill +100, lead +360, buttons +500 */
+#top .hero__line-in { transition: transform 600ms var(--ease-rise) calc(var(--i, 0) * 120ms); }
+#top .hero__rise { transition: clip-path 500ms var(--ease-rise) var(--d, 0ms), transform 500ms var(--ease-rise) var(--d, 0ms); }
+#top.is-text .hero__rise:not(.is-landed) { clip-path: inset(-12px); }    /* the clip comes off on transitionend */
+#top .hero__pillwrap { --d: 100ms; }
+#top .hero__lead { --d: 360ms; }
+#top .hero__btns { --d: 500ms; }
+
+/* landing the final state at once (fail-safe, pause, reduced motion, hidden tab): no transitions */
+#top.is-static .hero__line-in,
+#top.is-static .hero__rise,
+#top.is-static .hero__rail,
+#top.is-static .hero__label { transition: none; }
+
+/* ============================================================ lg-narrow 1200–1439 */
+@media (max-width: 1439.98px) {
+  .hero__h1 { font-size: 72px; line-height: 72px; }
+}
+
+/* the strip below 1440: weighted columns so every name stays on one line and the label takes two (layout #18) */
+@media (min-width: 1200px) and (max-width: 1439.98px) {
+  .hero-strip { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr); }
+}
+
+/* ============================================================ stacked < 1200 */
+@media (max-width: 1199.98px) {
+  .hero { display: flex; flex-direction: column; min-height: 0; }
+  .hero__rail { display: none; }
+  .hero__text { padding: 80px 64px 64px; }
+  .hero__copy { max-width: none; }
+  .hero__h1 { font-size: 64px; line-height: 64px; }
+  .hero__stop { margin-top: -16px; margin-left: calc(0.06em - 4px); }   /* the sm orb starts 1 art px in */
+  .hero__stop--lg { display: none; }
+  .hero__stop--sm { display: inline-block; }
+  .hero__cell { flex: none; height: 480px; border-top: 1px solid var(--line); }
+  .hero__stage { inset: auto 0 0 0; height: 480px; }
+  .hero__fig { left: calc(50% - 112px); left: round(down, 50% - 112px, 1px); }
+  .hero__label { width: calc(50% - 116px + var(--pl) * 4px); width: calc(round(down, 50% - 112px, 1px) + var(--pl) * 4px - 4px); }
+
+  .hero-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hero-strip > .cell { min-height: 112px; }
+}
+@media (max-width: 1023.98px) {
+  .hero-strip > .cell { padding: var(--sp-16); }
+  .hero-strip__glyph { right: var(--sp-16); bottom: var(--sp-16); }
+}
+
+/* ============================================================ sm < 768 */
+@media (max-width: 767.98px) {
+  .hero__text { padding: 64px var(--gutter) 40px; }
+  .hero__lines--three { display: none; }
+  .hero__lines--four { display: flex; }
+  .hero__h1 { font-size: 40px; line-height: 44px; }
+  .hero__label { font-size: 12px; }
+  /* 512, not 480: the floor drops 32 px so the 2-block left stack stays clear of the 10 mK label (a11y #3) and the
+     whole 512 px canvas fits; the labels' card background and z-index stay as the fallback */
+  .hero__cell { height: 512px; }
+  .hero__stage { height: 512px; }
+
+  .hero-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero-strip__label { grid-column: 1 / -1; min-height: 64px !important; }
+  .hero-strip__cite:last-child { grid-column: 1 / -1; }
+}
+/* below ~372 the longest line ("Verified quantum", 8 em) would not fit at 40 px: scale it with the viewport, on whole px */
+@media (max-width: 371.98px) {
+  .hero__h1 { font-size: round(down, (100vw - 32px) / 8.1, 1px); line-height: round(nearest, 1.1em, 1px); }
+}

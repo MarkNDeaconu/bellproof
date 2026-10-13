@@ -1,0 +1,119 @@
+/* Trust · design-spec §5.2. Owner: sections-1.
+   A. statement area (min-height 560) with six tag chips on strings · B. four cells · C. closing h3 · D. example line. */
+
+.trust { padding: var(--sec-pad-top) 0 var(--seam); }
+
+/* ---- A · statement with strings --------------------------------------------------------------- */
+.trust__stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 560px;
+}
+.trust__strings {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 0;
+}
+.trust__head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--sp-16) var(--sp-24);
+  background: var(--surface);               /* the strings end at the headline block's knots, never under the text */
+}
+.trust__h2 { max-width: 800px; }
+.trust__lead { max-width: var(--measure-lead); margin-top: var(--sp-24); }
+
+.trust__chips { position: absolute; inset: 0; margin: 0; padding: 0; z-index: 2; pointer-events: none; }
+.trust__chip {
+  position: absolute;
+  left: var(--hx);
+  top: var(--hy);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  padding: 12px 16px 12px 12px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text);
+  white-space: nowrap;
+  pointer-events: auto;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  margin: -28px 0 0 0;                       /* chip anchored at its centre (height 56); x via translate below */
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 300ms var(--ease-ui) calc(var(--i, 0) * 70ms), translate 300ms var(--ease-rise) calc(var(--i, 0) * 70ms);
+  translate: -50% 8px;
+}
+.trust__chip:nth-child(1) { --i: 0; } .trust__chip:nth-child(2) { --i: 1; } .trust__chip:nth-child(3) { --i: 2; }
+.trust__chip:nth-child(4) { --i: 3; } .trust__chip:nth-child(5) { --i: 4; } .trust__chip:nth-child(6) { --i: 5; }
+.trust__stage.is-in .trust__chip { opacity: 1; translate: -50% 0; }
+.trust__chip.is-drag { cursor: grabbing; z-index: 3; }
+.trust__chip-ico { display: inline-flex; line-height: 0; }
+.trust__chip-label { color: var(--text); }
+.trust__knot {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin-top: -2px;
+  background: var(--dot);
+}
+.trust__knot--l { left: -2px; }
+.trust__knot--r { right: -2px; }
+
+/* ---- B · four cells ---------------------------------------------------------------------------- */
+.trust__cells { margin-top: var(--seam); }
+.trust__cell { min-height: 320px; }
+.trust__cell-ico { display: block; line-height: 0; height: 80px; }           /* icon row: the 80px scale sets the row */
+.trust__cell-ico .px { display: block; }
+.trust__cell-ico:not(.trust__cell-ico--scale) .px { margin-top: 8px; }        /* 64px icons sit on the scale's baseline */
+
+/* ---- C / D ------------------------------------------------------------------------------------- */
+.trust__closing { max-width: 880px; margin: var(--sp-80) auto 0; }
+.trust__example {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-12) var(--sp-16);
+  max-width: var(--measure-lead);
+  margin: var(--sp-24) auto 0;
+  text-align: center;
+}
+
+/* 1024–1279: the stage is 944–1200 wide, so the side chips (8 % / 88 %) would sit on a 640 lead */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .trust__lead { max-width: 480px; }
+}
+
+@media (max-width: 1023.98px) {
+  .trust__stage { min-height: 480px; }
+  .trust__cell { min-height: 280px; }
+  .trust__chip { cursor: default; }
+  .trust__closing { margin-top: var(--seam); }
+}
+
+/* sm: chips stack in a centred column under the headline, no strings, no drag */
+@media (max-width: 767.98px) {
+  .trust__stage { display: flex; flex-direction: column; align-items: center; min-height: 0; gap: var(--sp-32); }
+  .trust__strings { display: none; }
+  .trust__head { padding: 0; background: none; }
+  .trust__chips { position: static; display: flex; flex-direction: column; align-items: center; gap: var(--sp-12); }
+  .trust__chip { position: static; margin: 0; translate: none; transform: none !important; touch-action: auto; }
+  .trust__stage.is-in .trust__chip { translate: none; }
+  .trust__knot { display: none; }
+  .trust__cell { min-height: 0; }
+}
+
+:root[data-motion="reduced"] .trust__chip { opacity: 1; translate: -50% 0; transition: none; }
+@media (max-width: 767.98px) { :root[data-motion="reduced"] .trust__chip { translate: none; } }

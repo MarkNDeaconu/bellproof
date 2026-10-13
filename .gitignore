@@ -1,0 +1,18 @@
+# Dependencies and build output
+node_modules/
+dist/
+.qa/
+*.log
+.DS_Store
+
+# QA evidence: hundreds of MB of captures, kept locally only
+website/attempt-*/qa/
+
+# Research on mistral.ai (captures, probe scripts, forensics notes): kept locally, not published
+website/research/mistral/
+
+# Local tool scratch
+website/tools/node_modules/
+
+# Local editor/agent config (contains machine-specific paths)
+.claude/

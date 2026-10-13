@@ -1,0 +1,193 @@
+/* Nav · design-spec §4.1 as revised (revision-1 §1.7, LC3). Owner: layout-core.
+   lg ≥1200  | logo 160 | 5 items | …spacer… | ⏸ Pause motion | Contact | ▶ Watch the demo (ink) |
+   1024–1279 | same row; the pause cell icon-only (its label stays for AT); 11px cells below 1200
+   md        | logo + wordmark 160 | …spacer… | ⏸ | Contact | ▶ Watch the demo (ink) | ⣿ 48 |
+   sm        | bell 48 | Bellproof (flex, left) | ⣿ 48 |   (also .nav--compact: any width whose row overflows,
+                                                         e.g. 200 % text zoom; set by nav.ts)
+   open      | bell | Bellproof | × |  + the panel: CTA row, rows 01–05, the pause row. */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+.nav__bar { display: flex; height: var(--nav-h); }
+
+.nav__cell {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: var(--sp-8);
+  height: 100%;
+  padding: 0 var(--sp-16);
+  border-right: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--fs-h6);
+  line-height: var(--lh-h6);
+  letter-spacing: var(--ls-h6);
+  white-space: nowrap;
+  transition: background-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui);
+}
+.nav__cell:focus-visible { outline-offset: -4px; }
+a.nav__cell:hover,
+button.nav__cell:hover { background: var(--paper); }
+
+/* logo: the pixel bell at 2px/art px (24×22, 48 − 22 = 26) + the wordmark, gap 10 */
+.nav__logo { width: 160px; gap: 10px; }
+.nav__mark { display: flex; color: var(--ink); }
+.nav__mark svg { display: block; }
+.nav__wordmark { font-family: var(--font-display); font-weight: 500; font-size: 18px; line-height: 24px; letter-spacing: 0; }
+
+.nav__primary { display: flex; height: 100%; }
+.nav__items { display: flex; height: 100%; }
+.nav__items > li { display: flex; height: 100%; }
+/* scroll-spy: the section under the viewport centre lifts its tab to paper */
+.nav__link[aria-current] { background: var(--paper); }
+
+.nav__spacer { flex: 1; min-width: 0; border-right: 1px solid var(--line); }
+
+/* pause motion: name stays "Pause motion"; aria-pressed carries the state (⏸ → ▶ in the same 5×5 box) */
+.nav__pause-icon { display: flex; }                       /* 48 − 20 = 28 */
+.nav__pause-icon > svg { display: block; }
+.nav__pause[aria-pressed="true"] { background: var(--paper-2); }
+.nav__pause[aria-pressed="true"] .nav__pause-icon { color: var(--blue); }
+
+/* the solid ink cell (the only inverted cell) */
+.nav__demo {
+  border-right: 0;
+  background: var(--action);
+  color: var(--on-dark);
+  --focus-ring: var(--on-dark-accent);
+}
+a.nav__demo:hover { background: var(--action-hover); }
+.nav__demo .icon { flex: none; display: block; }          /* 48 − 32 = 16 */
+
+.nav__toggle { display: none; }
+
+/* 1024–1199: tighten cells (the row is 1012px at 11px); below 1280 the pause cell shows its glyph only
+   (its label stays for AT); measured: no overflow at 1024, 1200 and 1280 */
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  .nav__cell { padding: 0 11px; }
+  .nav__logo { width: 144px; }
+}
+@media (max-width: 1279.98px) {
+  .nav__pause { width: 48px; padding: 0; justify-content: center; }
+  .nav__pause .nav__pause-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+
+/* ---- md: collapse the five items into the menu ------------------------------------------- */
+@media (max-width: 1023.98px) {
+  .nav__primary { display: none; }
+  .nav__toggle {
+    display: inline-flex;
+    justify-content: center;
+    width: 48px;
+    padding: 0;
+    border-right: 0;
+  }
+  .nav__toggle-icon { display: flex; }                   /* 48 − 28 = 20; morph() swaps the svg inside */
+  .nav__toggle-icon > svg { display: block; }
+}
+
+/* ---- sm and .nav--compact: | bell | Bellproof | ⣿ | ------------------------------------- */
+@media (max-width: 767.98px) {
+  .nav__primary, .nav__pause, .nav__contact, .nav__demo, .nav__spacer { display: none; }
+  .nav__logo { flex: 1; width: auto; padding: 0; gap: 0; border-right: 1px solid var(--line); }
+  .nav__mark { flex: none; width: 48px; height: 100%; align-items: center; padding-left: 12px; border-right: 1px solid var(--line); }   /* 48 − 1 divider: centring would land at 11.5 */
+  .nav__wordmark { padding: 0 var(--sp-16); }
+  .nav__toggle { display: inline-flex; justify-content: center; width: 48px; padding: 0; border-right: 0; }
+  .nav__toggle-icon { display: flex; }
+}
+.nav--compact .nav__primary, .nav--compact .nav__pause, .nav--compact .nav__contact,
+.nav--compact .nav__demo, .nav--compact .nav__spacer { display: none; }
+.nav--compact .nav__logo { flex: 1; width: auto; padding: 0; gap: 0; }
+.nav--compact .nav__mark { flex: none; width: 48px; height: 100%; align-items: center; padding-left: 12px; border-right: 1px solid var(--line); }
+.nav--compact .nav__wordmark { padding: 0 var(--sp-16); }
+.nav--compact .nav__toggle { display: inline-flex; justify-content: center; width: 48px; padding: 0; border-right: 0; }
+.nav--compact .nav__toggle-icon { display: flex; }
+
+/* open (md, sm, compact): | bell | Bellproof | × | */
+.nav.is-open .nav__pause, .nav.is-open .nav__contact, .nav.is-open .nav__demo { display: none; }
+.nav.is-open .nav__logo { flex: 1; width: auto; }
+.nav.is-open .nav__spacer { display: none; }
+
+/* ---- the menu panel (md/sm/compact): full height under the bar, slides in from the right -- */
+.nav__panel { display: none; }
+@media (max-width: 1023.98px) { .nav__panel { display: flex; } }
+.nav--compact .nav__panel { display: flex; }
+.nav__panel {
+  position: fixed;
+  top: var(--nav-total);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 99;
+  flex-direction: column;
+  background: var(--card);
+  box-shadow: var(--shadow-menu);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform var(--dur-panel) var(--ease-ui), visibility 0s linear var(--dur-panel);
+}
+.nav.is-open .nav__panel {
+  transform: none;
+  visibility: visible;
+  transition: transform var(--dur-panel) var(--ease-ui);
+}
+:root[data-motion="reduced"] .nav__panel { transition: none !important; }
+
+/* CTA row first: two half-width buttons */
+.nav__ctas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-8);
+  padding: var(--sp-16) var(--gutter);
+  border-bottom: 1px solid var(--line);
+}
+.nav__ctas > .btn { justify-content: center; }
+
+/* rows 01–05: mono number in blue, h5 label, 56px, no chevrons; the active row gets a 4px ink bar */
+.nav__rows > li { border-bottom: 1px solid var(--line); }
+.nav__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-16);
+  width: 100%;
+  height: 56px;
+  padding: 0 var(--gutter);
+  color: var(--text);
+  text-align: left;
+  transition: background-color var(--dur-ui) var(--ease-ui);
+}
+.nav__row:hover { background: var(--paper); }
+.nav__row:focus-visible { outline-offset: -4px; }
+.nav__row[aria-current]::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--ink);
+}
+.nav__row-n { flex: none; width: 24px; color: var(--blue); font-family: var(--font-mono); font-size: 14px; line-height: 20px; font-variant-numeric: tabular-nums; }
+.nav__row-label { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-h5); line-height: var(--lh-h5); }
+.nav__row--pause { border-bottom: 1px solid var(--line); }
+.nav__row--pause .nav__pause-icon { width: 24px; }
+.nav__row--pause[aria-pressed="true"] { background: var(--paper-2); }
+.nav__row--pause[aria-pressed="true"] .nav__pause-icon { color: var(--blue); }
+
+/* ---- forced colours (a11y #14): states that rely on background tints get a system outline --- */
+@media (forced-colors: active) {
+  .nav { border-bottom-color: CanvasText; }
+  .nav__cell, .nav__spacer, .nav__rows > li { border-color: CanvasText; }
+  .nav__link[aria-current], .nav__row[aria-current] { outline: 2px solid Highlight; outline-offset: -4px; }
+  .nav__row[aria-current]::before { background: Highlight; }
+  .nav__pause[aria-pressed="true"], .nav__row--pause[aria-pressed="true"] { outline: 2px solid Highlight; outline-offset: -4px; }
+  .nav__demo { border: 1px solid ButtonText; }
+}

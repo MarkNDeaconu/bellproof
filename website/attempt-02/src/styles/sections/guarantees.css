@@ -1,0 +1,110 @@
+/* Section 9 · What the certificate guarantees · #guarantees (design-spec §5.9). Owner: sections-3.
+   A head · B certificate card (+ cert-mint on its top-right corner) | where it goes · C guaranteed | not covered
+   · D closing line. */
+
+#guarantees .g-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--seam);
+  padding-block: var(--sec-pad-top) var(--seam);
+}
+
+/* ---- A ---------------------------------------------------------------------------------------------------------- */
+.g-head { display: flex; flex-direction: column; align-items: flex-start; max-width: var(--measure-h2); }
+.g-head .lead { max-width: var(--measure-lead); margin-top: var(--sp-24); }
+
+/* ---- B: 7/12 certificate + 5/12 where it goes ----------------------------------------------------------------- */
+.g-b { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-64); }
+@media (min-width: 1024px) {
+  .g-b { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--sp-40); }
+  .g-cert { grid-column: span 7; }
+  .g-where { grid-column: span 5; padding-left: var(--sp-40); }
+}
+
+/* the card, and the piece straddling its top-right corner (32 px over the top edge; at lg also over the right) */
+.g-cert {
+  --mint-w: 288px;
+  --mint-h: 192px;
+  --mint-over: 56px;            /* canvas over the card's top edge: its art (from row 6) shows 32 px above the card */
+  --mint-right: 0px;            /* negative = hangs over the right edge too */
+  --card-pad: var(--sp-40);
+  container: gcert / inline-size;
+  position: relative;
+  align-self: start;
+}
+@media (min-width: 1024px) { .g-cert { --mint-right: -32px; } }
+@media (max-width: 767.98px) { .g-cert { --card-pad: var(--sp-24); } }
+
+.g-card { position: relative; padding: var(--card-pad); }
+.g-mint {
+  position: absolute;
+  z-index: 1;
+  top: calc(-1 * var(--mint-over));
+  right: var(--mint-right);
+  line-height: 0;
+}
+/* the card reads like a letterhead: title top-left beside the piece, then the form full width under the piece
+   (its art ends at canvas row 42 = 168 px, i.e. 168 − overhang into the card; the rows start 24 px below that) */
+.g-cert { --head-h: calc(168px - var(--mint-over) + 24px); }
+.g-card__title { max-width: calc(100% + var(--card-pad) - var(--mint-w) - var(--mint-right) - 24px); }
+.g-rows { margin-top: calc(var(--head-h) - var(--card-pad) - var(--lh-eyebrow)); }
+
+/* narrow cards: the piece takes the whole top band; the title moves under it */
+@container gcert (max-width: 639.98px) {
+  .g-card { padding-top: var(--head-h); }
+  .g-card__title { max-width: none; }
+  .g-rows { margin-top: var(--sp-24); }
+}
+
+.g-v { position: relative; }
+.g-v__vis { display: inline-grid; }
+.g-v__ghost, .g-v__typed { grid-area: 1 / 1; }
+.g-v__ghost { visibility: hidden; }
+.g-v__typed .cursor { width: 8px; height: 16px; margin-left: 1px; vertical-align: -2px; background: var(--on-dark-accent); }
+.g-v--verdict { color: var(--on-dark-accent); font-weight: 500; }
+.g-v__typed.is-stamped { animation: g-stamp 250ms steps(1, end); }
+@keyframes g-stamp {
+  0%   { color: var(--on-dark); transform: translateY(2px); }
+  33%  { color: var(--on-dark); transform: none; }
+  100% { color: var(--on-dark-accent); }
+}
+:root[data-motion="reduced"] .g-v__typed { animation: none; }
+
+/* where it goes */
+.g-where__label { margin-bottom: var(--sp-24); }
+.g-where__list { margin: 0; padding: 0; list-style: none; border-bottom: 1px solid var(--line); }
+.g-where__list > li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding-block: var(--sp-24);
+  border-top: 1px solid var(--line);
+}
+.g-soft { color: var(--text-soft); }
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .g-where__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-40); border-bottom: 0; }
+  .g-where__list > li { border-bottom: 1px solid var(--line); margin-bottom: -1px; }
+}
+
+/* ---- C: Guaranteed | Not covered (equal weight) ----------------------------------------------------------------- */
+.g-cells > .cell { gap: var(--sp-24); }
+.g-yes > .h4 { color: var(--blue); }
+.g-no > .h4 { color: var(--alert); }
+.g-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.g-list > li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: var(--sp-16);
+  padding-block: var(--sp-16);
+  border-top: 1px solid var(--line);
+}
+.g-list > li:last-child { padding-bottom: 0; }
+.g-list__icon { line-height: 0; margin-top: -2px; }
+.g-yes .g-list__icon { color: var(--blue); }
+.g-no .g-list__icon { color: var(--alert); }
+.g-no .g-list > li { border-top-color: var(--hairline-strong); }
+.g-lead { color: var(--text); }
+
+/* ---- D ---------------------------------------------------------------------------------------------------------- */
+.g-d { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-24); max-width: var(--measure-h2); }
+.g-d__chip { line-height: 0; }

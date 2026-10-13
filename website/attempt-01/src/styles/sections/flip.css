@@ -1,0 +1,73 @@
+/* Flip · design-spec §5.3. Owner: sections-1.
+   A. 7/12 + 5/12 head + fridge-out cell · B. running example cells · C. the table · D. the paradox band. */
+
+.flip { padding: var(--sec-pad-top) 0 var(--seam); }
+
+/* ---- A ------------------------------------------------------------------------------------------- */
+.flip__top { align-items: stretch; }
+.flip__head { display: flex; flex-direction: column; align-items: flex-start; }
+.flip__lead { margin-top: var(--sp-24); }
+.flip__fig-wrap { display: flex; }
+.flip__fig {
+  display: grid;
+  place-items: center;
+  flex: 1;
+  min-height: 320px;
+  margin: 0;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  line-height: 0;
+}
+
+/* ---- B · running example: question cell (2 rows tall) + two stacked cards --------------------------- */
+.flip__example {
+  margin-top: var(--seam);
+  --cols-sm: 1;
+  --cols-md: 2;
+  --cols-lg: 2;
+}
+@media (min-width: 768px) {
+  .flip__example { grid-template-rows: auto auto; }
+  .flip__q { grid-row: span 2; }
+}
+.flip__q { gap: var(--sp-16); padding-right: 160px; }
+.flip__chip { position: absolute; top: var(--cell-pad); right: var(--cell-pad); }
+.flip__question { margin-top: -4px; }
+.flip__why { margin-top: var(--sp-16); }
+.flip__why + .cell__body { margin-top: -8px; }
+.flip__card { gap: var(--sp-12); }
+.flip__num { margin-top: var(--sp-8); word-break: keep-all; }
+.flip__card .tag-illustrative { vertical-align: 1px; }
+
+/* ---- C · table ------------------------------------------------------------------------------------ */
+.flip__table-block { margin-top: var(--seam); }
+.flip__table { margin-top: var(--sp-32); }
+.flip__table th:first-child, .flip__table td:first-child { padding-left: 0; }
+.flip__table th:last-child, .flip__table td:last-child { padding-right: 0; }
+@media (min-width: 768px) {
+  .flip__table th, .flip__table td { width: 33.333%; }
+}
+
+/* ---- D · the paradox band ---------------------------------------------------------------------------- */
+.paradox {
+  position: relative;
+  margin-top: var(--seam);
+  padding: var(--sp-128) 0;
+  min-height: 512px;                         /* room for the 2-stack at the left edge (2M) under the copy */
+  overflow: hidden;
+}
+.paradox__stage { position: absolute; inset: 0; z-index: 0; }
+.paradox__wrap { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; }
+.paradox__statement { max-width: 1000px; margin-top: var(--sp-16); }
+.paradox__sub { margin-top: var(--sp-32); }
+.paradox__fallback { position: absolute; right: var(--module); bottom: 0; }
+
+@media (max-width: 1023.98px) {
+  .flip__q { padding-right: var(--cell-pad); padding-top: calc(var(--cell-pad) + 40px); }
+  .flip__chip { top: var(--cell-pad); right: auto; left: var(--cell-pad); }
+  .paradox { padding: var(--sp-80) 0 calc(var(--sp-80) + 128px); min-height: 0; }
+}
+@media (max-width: 767.98px) {
+  .flip__fig { min-height: 240px; }
+  .flip__table { margin-top: var(--sp-24); }
+}

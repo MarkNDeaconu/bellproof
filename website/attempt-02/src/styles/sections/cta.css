@@ -1,0 +1,64 @@
+/* Section 10 · CTA band · #cta (design-spec §4.7/§5.10, revision-1 §1.8). Owner: sections-3.
+   The section (ink, grid on colour) is layout-core's; inside: head · a row of 3 link cells · Contact · the dusk
+   staircase with the walkers layer. */
+
+.cta-head { display: flex; flex-direction: column; align-items: flex-start; padding-top: var(--sp-80); }
+.cta-h { max-width: 1100px; color: var(--text); }
+.cta-h__s { display: block; text-wrap: balance; }          /* one sentence per line (layout #10) */
+.cta-head .lead { max-width: var(--measure-lead); margin-top: var(--sp-24); }
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  .cta-h { font-size: 80px; line-height: 80px; }           /* display 80/80 at 1024–1199 */
+}
+
+/* link cells: the whole cell is the link — sprite left, title + body, ↗ / › bottom-right; height follows content */
+.cta-cells-wrap { margin-top: var(--sp-64); }
+.cta-cells { grid-template-columns: minmax(0, 1fr); }
+.cta-cell {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: var(--sp-24);
+  padding: var(--sp-32) var(--cell-pad);
+  color: var(--text);
+  text-decoration: none;
+}
+.cta-cell__icon { line-height: 0; }
+.cta-cell__text { display: flex; flex-direction: column; gap: var(--sp-8); min-width: 0; }
+.cta-cell__title { color: var(--text); }
+.cta-cell__body { color: var(--text-soft); }
+.cta-cell__glyph { align-self: end; display: inline-flex; line-height: 0; color: var(--text-soft); transition: color var(--dur-ui) var(--ease-ui); }
+.cta-cell:is(:hover, :focus-visible) .cta-cell__glyph { color: var(--text); }
+.cta-cell:is(:hover, :focus-visible) .cta-cell__glyph > svg { animation: s3-glyph 166ms steps(1, end); }
+@keyframes s3-glyph { 0%, 99% { transform: translate(4px, 0); } 100% { transform: none; } }
+:root[data-motion="reduced"] .cta-cell__glyph > svg { animation: none; }
+@media (min-width: 1200px) {
+  .cta-cells { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Contact; the space under it is the walkers' headroom (their heads reach 72 px above the steps) */
+.cta-final { display: flex; justify-content: center; padding-block: var(--sp-64) var(--sp-128); }
+
+/* the dusk staircase (bands `dusk()`), and the walkers layer: 128 px of air above the 64 px strip, clipped at the
+   page edges so the pair can walk in and out */
+.cta-dusk { position: relative; height: 64px; }
+.cta-stairs { position: absolute; inset: 0; }
+.cta-walk {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 192px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.cta-walker { position: absolute; top: 0; left: 0; pointer-events: auto; will-change: transform; }
+
+@media (max-width: 1023.98px) {
+  .cta-head { padding-top: var(--sp-64); }
+  .cta-cells-wrap { margin-top: var(--sp-40); }
+  .cta-final { padding-block: var(--sp-40) var(--sp-128); }
+}
+@media (max-width: 767.98px) {
+  .cta-cell { column-gap: var(--sp-16); padding: var(--sp-24) var(--cell-pad); }
+  .cta-final > .btn { width: 100%; justify-content: space-between; }
+}

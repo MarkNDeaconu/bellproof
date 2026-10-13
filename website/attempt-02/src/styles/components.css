@@ -1,0 +1,260 @@
+/* Components · design-spec §4. Owner: layout-core.
+   Buttons · text links · pills and tags · eyebrows · dark cards and key/value rows · tables · the pixel bracket.
+   The nav lives in styles/sections/nav.css, the footer in styles/sections/footer.css.
+   Every colour reads the scope-aware roles from tokens.css, so components work inside .on-dark. */
+
+/* art-icons' pixel-step hovers (data-hop="step|hop|out|press|drop" on the hover target; the icon's rects
+   move in whole art px). Unlayered, it only targets `[data-hop] .icon rect`. */
+@import '../art/icons/icons.css';
+
+@layer bp.components {
+/* ---- 4.2 buttons ---------------------------------------------------------------------------
+   <a class="btn btn--primary" data-hop="step" href="#verify"><span class="btn__label">…</span>
+     <span class="btn__icon"><i data-icon="ui-chevron"></i></span></a>
+   Outbound: data-hop="out" + ui-external-sm. Height 48 (compact 40), radius 4, h6 label.
+   Signature hover ("pixel step"): data-hop="step" moves the chevron's pixels right one art px twice
+   (4px at 0ms, 8px at 83ms) via art-icons' icons.css; the label never moves. Icons sit in flex boxes
+   whose height minus the icon height is even (46 − 20), so they land on whole CSS px. */
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--text);
+  --btn-line: transparent;
+  --btn-bg-hover: var(--btn-bg);
+  --btn-line-hover: var(--btn-line);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-8);
+  height: 48px;
+  padding: 0 var(--sp-16);
+  border: 1px solid var(--btn-line);
+  border-radius: var(--r-control);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--fs-h6);
+  line-height: var(--lh-h6);
+  letter-spacing: var(--ls-h6);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--dur-ui) var(--ease-ui), border-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui);
+}
+.btn:hover { background: var(--btn-bg-hover); border-color: var(--btn-line-hover); }
+.btn__label { display: block; }
+.btn__icon { display: flex; flex: none; align-items: center; }
+.btn__icon > svg { display: block; }
+.btn__icon--lead { order: -1; }                        /* leading glyph (e.g. play) */
+
+.btn--primary         { --btn-bg: var(--action); --btn-fg: var(--on-dark); --btn-bg-hover: var(--action-hover); }
+.btn--outline         { --btn-line: var(--hairline-strong); --btn-bg-hover: var(--action-outline-hover); --btn-line-hover: var(--text); }
+.btn--ghost           { --btn-bg: var(--ghost); --btn-bg-hover: var(--ghost-hover); }
+.btn--primary-on-dark { --btn-bg: var(--paper); --btn-fg: var(--ink); --btn-bg-hover: var(--card); }
+.btn--ghost-on-dark   { --btn-bg: var(--ghost-on-dark); --btn-fg: var(--on-dark); --btn-bg-hover: var(--ghost-on-dark-hover); }
+.on-dark .btn--outline { --btn-line: var(--line-strong); --btn-bg-hover: var(--ink-2); --btn-line-hover: var(--on-dark); }
+.btn--compact { height: 40px; }
+.btn--block { display: flex; width: 100%; justify-content: space-between; }
+
+/* two buttons side by side: 12px gap; stacked full-width on sm with 8px gap */
+.btn-row { display: flex; flex-wrap: wrap; gap: var(--sp-12); }
+@media (max-width: 767.98px) {
+  .btn-row { flex-direction: column; align-items: stretch; gap: var(--sp-8); width: 100%; }
+  .btn-row > .btn { justify-content: space-between; }
+}
+
+/* ---- text link: inherit colour, 1px underline at 3px offset; hover underline goes blue ------- */
+.link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: currentColor;
+  transition: text-decoration-color var(--dur-ui) var(--ease-ui);
+}
+.link:hover { text-decoration-color: var(--blue); }
+.on-dark .link:hover { text-decoration-color: var(--on-dark-accent); }
+.link--quiet { text-decoration-color: transparent; }
+.link--quiet:hover { text-decoration-color: currentColor; }
+/* a link with a trailing glyph: flex row, glyph top-aligned to the first 24px line (24 − 20 = 4 → 2px) */
+.link--icon { display: inline-flex; align-items: flex-start; gap: 6px; }
+.link--icon > .icon,
+.link--icon > .link__glyph { flex: none; margin-top: 2px; display: flex; }
+
+/* ---- 4.3 eyebrow: blue on light, azure on dark, 16px above the headline ---------------------- */
+.eyebrow { color: var(--accent-text); }
+.eyebrow + :is(.display, .h2, .h3) { margin-top: var(--sp-16); }
+
+/* ---- 4.3 announcement pill, revised (revision-1 §1.1.8, LC5): a compact announcement ABOVE the H1.
+   40 tall, radius 20, 1px hairline, padding 4 12 4 4, bg card; a 32×32 SQUARE tile (no radius, no clip) with
+   tc-glyph `sm` (8×8 → 32px); h6 label; trailing chevron. Hover/focus flips the tile ?→T→C→? (hydrate() wires
+   the tile's piece through art-icons' hoverable()). No full-width bar at any width.
+   <a class="pill" data-hop="step" href="…"><span class="pill__tile"><span class="px" data-piece="tc-glyph"
+     data-variant="sm" data-decorative></span></span><span class="pill__label">…long…</span>
+     <span class="pill__label pill__label--short">…short…</span><span class="btn__icon">chevron</span></a> */
+.pill {
+  display: inline-flex;
+  align-items: center;                 /* 38 (40 − 2 border) − 32 = 6; − 20 = 18: whole px */
+  gap: var(--sp-12);
+  height: 40px;
+  padding: 4px var(--sp-12) 4px 4px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--card);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--fs-h6);
+  line-height: var(--lh-h6);
+  letter-spacing: var(--ls-h6);
+  white-space: nowrap;
+  transition: background-color var(--dur-ui) var(--ease-ui);
+}
+.pill:hover { background: var(--paper); }
+.pill__tile { display: flex; flex: none; width: 32px; height: 32px; }
+.pill { max-width: 100%; }
+.pill__label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pill__label--short { display: none; }
+@media (max-width: 1199.98px) {
+  .pill__label:not(.pill__label--short):has(+ .pill__label--short) { display: none; }
+  .pill__label--short { display: block; }
+}
+
+/* ---- RUNNING EXAMPLE chip: micro, ink pill, exactly as the deck --------------------------- */
+.chip-example {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: var(--on-dark);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-micro);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.on-dark .chip-example { background: var(--on-dark); color: var(--ink); }
+
+/* ---- `illustrative` tag: micro, muted, no background, 8px after the number it qualifies ---- */
+.tag-illustrative {
+  display: inline-block;
+  margin-left: var(--sp-8);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-micro);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+}
+
+/* ---- mono tags (COST: TINY …): micro, soft ink on 5% ink, radius 4 ------------------------ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--sp-8);
+  padding: 4px 8px;
+  border-radius: var(--r-control);
+  background: var(--ghost);
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-micro);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+}
+.tag--blue  { color: var(--blue); }
+.tag--alert { color: var(--alert); background: var(--alert-tint); }
+.on-dark .tag--blue { color: var(--on-dark-accent); }
+
+/* ---- 4.4 dark card and key/value rows (certificate, "what stands behind it") --------------- */
+.card-dark { padding: var(--sp-40); background: var(--ink); }
+@media (max-width: 767.98px) { .card-dark { padding: var(--sp-24); } }
+.kv {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-mono);
+}
+.kv > dt, .kv > dd, .kv__k, .kv__v { padding-block: 10px; border-top: 1px solid var(--line); margin: 0; }
+.kv > dt, .kv__k { color: var(--accent-text); padding-right: var(--sp-16); }
+.kv > dd, .kv__v { color: var(--text); overflow-wrap: anywhere; }
+@media (max-width: 767.98px) { .kv { grid-template-columns: 112px minmax(0, 1fr); } }
+
+/* ---- the pixel bracket (pull quote): 4px blue bar + 2-art-px ticks top and bottom ---------- */
+.px-bracket { position: relative; padding-left: 28px; }
+.px-bracket::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 12px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--blue), var(--blue)) 0 0 / 4px 100% no-repeat,
+    linear-gradient(var(--blue), var(--blue)) 0 0 / 12px 4px no-repeat,
+    linear-gradient(var(--blue), var(--blue)) 0 100% / 12px 4px no-repeat;
+}
+
+/* ---- 4.5 tables ----------------------------------------------------------------------------
+   <table class="table"> with <thead> eyebrow headers (th.is-blue / th.is-alert colour a header),
+   row titles as <th scope="row"> (h5), cells body. Give each <td data-label="…"> for sm cards. */
+.table { width: 100%; border-top: 1px solid var(--line); text-align: left; }
+.table th, .table td {
+  padding: var(--sp-16) var(--sp-24);
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
+}
+.table tbody tr { height: 72px; }
+.table thead th {
+  padding-block: var(--sp-16);
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--fs-eyebrow);
+  line-height: var(--lh-eyebrow);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+}
+.table thead th.is-blue  { color: var(--blue); }
+.table thead th.is-alert { color: var(--alert); }
+.table tbody th {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--fs-h5);
+  line-height: var(--lh-h5);
+  color: var(--text);
+}
+.table td { font-size: var(--fs-body); line-height: var(--lh-body); color: var(--text); }
+@media (max-width: 1023.98px) { .table th, .table td { padding: var(--sp-12) var(--sp-16); } }
+@media (max-width: 767.98px) {
+  .table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .table, .table tbody, .table tr, .table th, .table td { display: block; }
+  .table tbody tr { height: auto; padding: var(--sp-16) 0; border-bottom: 1px solid var(--line); }
+  .table tbody th, .table td { padding: 0; border: 0; }
+  .table tbody th { margin-bottom: var(--sp-12); }
+  .table td + td { margin-top: var(--sp-12); }
+  .table td::before {
+    content: attr(data-label);
+    content: attr(data-label) / "";    /* rev 1 (LC7, a11y #16): visual label only; the header cell names it */
+    display: block;
+    margin-bottom: 2px;
+    color: var(--text-soft);
+    font-family: var(--font-mono);
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-caps);
+    text-transform: uppercase;
+  }
+  .table td.is-blue::before  { color: var(--blue); }
+  .table td.is-alert::before { color: var(--alert); }
+}
+
+/* integrator R2: the 4.6 tab card, the vertical tabs with a progress bar (auto-advance), the accordion and the mosaic
+   panels were removed here: revision 1 replaced those devices (originality #5, #6) and nothing uses them any more. */
+
+} /* @layer bp.components */

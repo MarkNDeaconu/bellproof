@@ -1,0 +1,133 @@
+/* Footer · design-spec §5.11 as revised (revision-1 §1.8, LC4). Owner: layout-core.
+   1 link columns (4 cells, padding 40; 2 at md; stacked at sm; capped at 1728) · 2 one-row sub-footer (120px:
+   socials left, tagline centre, copyright right; the founder credit row sits above it) · 3 the stage: the bell hanging from the sub-footer's
+   bottom hairline on a 1px cable, skirt 40px into the bands' stepped strata; Alice and Bob standing either side. */
+
+.footer {
+  position: relative;
+  background: var(--card);
+  color: var(--text);
+  border-top: 1px solid var(--line);
+}
+
+/* ---- 1 · link columns --------------------------------------------------------------------- */
+.footer__cols {
+  --cols-md: 2;
+  --cols-lg: 4;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  border-top: 0;
+}
+@media (min-width: 1729px) { .footer__cols { border-inline: 1px solid var(--line); } }
+.footer__col { padding: var(--sp-40); gap: 0; }
+.footer__label { margin: 0 0 var(--sp-24); color: var(--text-soft); font-family: var(--font-body); font-weight: 400; }   /* <h2 class="small"> (a11y #21) */
+.footer__links { display: flex; flex-direction: column; gap: var(--sp-4); }   /* 24 + 4 = 28px rhythm */
+.footer__link,
+.footer__text { font-size: var(--fs-body); line-height: var(--lh-body); }
+.footer__link {
+  display: inline-flex;            /* an own box, so the focus ring draws around the link (a11y #1) */
+  flex-direction: column;
+  align-self: flex-start;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--dur-ui) var(--ease-ui);
+}
+.footer__link:hover,
+.footer__link:focus-visible { text-decoration-color: var(--blue); }
+.footer__link-row { display: flex; align-items: flex-start; gap: 6px; }
+.footer__link-row > .icon { flex: none; display: block; margin-top: 2px; color: var(--text-soft); }   /* 24 − 20 = 4 → 2 */
+.footer__detail {
+  display: block;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-micro);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+.footer__links--research { gap: var(--sp-12); }
+.footer__text { color: var(--text-soft); }
+.footer__note { margin-top: var(--sp-12); color: var(--text-muted); font-size: var(--fs-small); line-height: var(--lh-small); }
+@media (max-width: 767.98px) { .footer__col { padding: var(--sp-24) var(--sp-16); } }
+
+/* ---- 1b · the founder credit (integrator R2, user request): one row between the columns and the sub-footer.
+   Its text starts on the columns' text line (cell padding 40, 16 below 768); the columns' bottom hairline is its top
+   and the sub-footer's top hairline its bottom, so no line doubles. Text left, mono links with ↗ right; wraps below. */
+.footer__credit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-12) var(--sp-40);
+  padding: var(--sp-24) calc(max(0px, (100% - var(--content-max)) / 2) + var(--sp-40));
+}
+.footer__credit-text { margin: 0; color: var(--text-soft); text-wrap: pretty; }   /* one line when the links fit beside it; else they wrap below */
+.footer__credit-text strong { color: var(--text); font-weight: 500; }
+.footer__credit-links { display: flex; flex-wrap: wrap; gap: var(--sp-8) var(--sp-24); margin: 0; padding: 0; list-style: none; }
+.footer__credit-link {
+  display: inline-flex;            /* an own box for the focus ring */
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--dur-ui) var(--ease-ui);
+}
+.footer__credit-link:hover,
+.footer__credit-link:focus-visible { text-decoration-color: var(--blue); }
+.footer__credit-link > .icon { flex: none; display: block; color: var(--text-soft); }
+@media (max-width: 767.98px) { .footer__credit { padding: var(--sp-24) var(--sp-16); } }
+
+/* ---- 2 · the sub-footer: one row, 120px, no void ------------------------------------------ */
+.footer__sub {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-24);
+  min-height: 120px;
+  padding: 0 max(var(--gutter), (100% - var(--content-max)) / 2);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);      /* the hairline the bell hangs from */
+}
+.footer__socials { display: flex; gap: var(--sp-24); }
+.footer__social { display: inline-flex; align-items: center; gap: var(--sp-8); }
+.footer__tagline { margin: 0; text-align: center; text-wrap: balance; }
+.footer__meta { display: flex; flex-direction: column; align-items: flex-end; margin: 0; color: var(--text-muted); text-align: right; }
+@media (max-width: 767.98px) {
+  .footer__sub { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: var(--sp-8); padding-block: var(--sp-24); }
+  .footer__socials:empty { display: none; }
+  .footer__meta { align-items: center; text-align: center; }
+}
+
+/* ---- 3 · the stage: bell zone (--zone = cable + bell − skirt) above the 256px strata ---------- */
+.footer__stage {
+  --zone: 204px;
+  position: relative;
+  height: calc(var(--zone) + 256px);
+  overflow: clip;                            /* the bell is lowered in from above the hairline */
+}
+.footer__strata { position: absolute; left: 0; right: 0; top: var(--zone); height: 256px; z-index: 0; }
+.footer__walkers { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.footer__walker {                              /* one creature's window onto a walkers canvas */
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 64px;
+  overflow: hidden;
+  will-change: transform;
+}
+.footer__walker > .px { position: absolute; top: 0; left: 0; }
+.footer__walker--b > .px { left: -112px; }   /* Bob: canvas columns 28–39 */
+.footer__bell { position: absolute; top: 0; z-index: 2; height: calc(var(--zone) + 40px); pointer-events: none; }
+.footer__cable { position: absolute; top: 0; width: 1px; height: 24px; background: var(--ink); }
+.footer__bell-mark { position: absolute; top: 24px; left: 0; display: flex; color: var(--ink); will-change: transform; }
+.footer__bell-mark svg { display: block; }
+@media (max-width: 767.98px) {
+  .footer__bell-mark svg { width: 144px; height: 132px; }   /* 12 px per art px: the pair still fits beside it */
+}

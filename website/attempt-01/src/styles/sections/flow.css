@@ -1,0 +1,211 @@
+/* Section 7 · #flow (design-spec §5.7). Owner: sections-2. Unlayered: beats the shared layers.
+   Head (6/12 + 6/12, lead bottom-aligned) · swimlanes with a hairline spine and the job token ·
+   outcome cells · the commit–reveal note with the demo details and two buttons.
+   lg rows: [card 1fr] [gutter 64] [spine 96] [gutter 64] [card 1fr]; < 1024: [spine 48] [gutter 64] [card]. */
+
+.flow {
+  padding-block: var(--sec-pad-top) var(--seam);
+}
+
+/* ---- A · head ------------------------------------------------------------------------------- */
+.flow__head { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-24); }
+.flow__intro .h2 { margin-top: var(--sp-16); max-width: 12em; }
+.flow__lead { max-width: var(--measure-lead); }
+@media (min-width: 1024px) {
+  .flow__head { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--sp-40); align-items: end; }
+}
+
+/* ---- B · swimlanes ---------------------------------------------------------------------------- */
+.flow__lanes {
+  --spine-x: 50%;
+  position: relative;
+  margin-top: var(--seam);
+}
+.flow__spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--spine-x);
+  width: 1px;
+  background: var(--hairline);
+  pointer-events: none;
+}
+
+.flow__heads {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+.flow__lanehead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  min-height: 48px;
+  margin: 0;
+  color: var(--text-muted);
+}
+.flow__lanehead > .flow__swatch { margin-right: 0; }
+.flow__lanehead--off { padding-left: 144px; }       /* aligned with the off-chain cards' left edge */
+.flow__lane-name { color: var(--text); }
+.flow__swatch { flex: none; width: 12px; height: 12px; border: 1px solid var(--hairline-strong); background: var(--card); }
+.flow__lanehead--on .flow__swatch { border: 0; border-left: 4px solid var(--blue); background: var(--card); box-shadow: inset 0 0 0 1px var(--hairline); }
+/* the asides are illustrative: one tag for the whole column, at the lanes' top right */
+.flow__illus {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--sp-8));
+  margin: 0;
+}
+
+.flow__steps { margin: 0; padding: 0; list-style: none; }
+.flow__row {
+  position: relative;
+  display: grid;
+  /* whole-pixel tracks: the left card column is floored, the right one takes the odd pixel */
+  --half: round(down, calc((100% - 288px) / 2), 1px);
+  grid-template-columns: var(--half) 64px 96px 64px minmax(0, 1fr);
+  column-gap: var(--sp-16);
+  align-items: center;
+  min-height: 128px;
+  padding-block: var(--sp-8);
+}
+.flow__steps > .flow__row:first-child { padding-top: var(--sp-16); min-height: 136px; }
+.flow__row--on .flow__card  { grid-column: 1; grid-row: 1; }
+.flow__row--on .flow__art   { grid-column: 2; grid-row: 1; }
+.flow__row--off .flow__art  { grid-column: 4; grid-row: 1; }
+.flow__row--off .flow__card { grid-column: 5; grid-row: 1; }
+
+/* a station on the spine for every step */
+.flow__stop { --x: var(--spine-x); --y: 50%; background: var(--hairline-strong); }
+.flow__steps > .flow__row:first-child .flow__stop { --y: calc(50% + 4px); }
+
+/* the pill-card */
+.flow__card {
+  align-self: stretch;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  column-gap: var(--sp-16);
+  align-content: center;
+  padding: var(--sp-16) 20px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  background: var(--card);
+  transition: border-color 0s;
+}
+.flow__card--on { border-left: 4px solid var(--blue); padding-left: 17px; }
+.flow__card--on.is-flash  { border-left-color: var(--ramp-1); }
+.flow__card--off.is-flash { border-color: var(--ramp-1); }
+.flow__n {
+  color: var(--text-muted);
+  transition: color var(--dur-ui) var(--ease-ui);
+  margin-top: -6px;                                    /* optical: the digit's cap on the title's cap */
+}
+.flow__card--on.is-reached .flow__n { color: var(--blue); }
+.flow__card--off.is-reached .flow__n { color: var(--text); }
+.flow__text { min-width: 0; }
+.flow__lanetag { display: none; margin: 0 0 var(--sp-4); color: var(--text-muted); }
+.flow__title { margin: 0; }
+.flow__body { margin: 0; color: var(--text-soft); }
+.flow__aside { margin: var(--sp-4) 0 0; color: var(--text-muted); overflow-wrap: anywhere; }
+.flow__card--on .flow__aside { color: var(--blue); }
+.flow__card--on .flow__aside--verdict { color: var(--ramp-5); font-weight: 500; }
+
+/* sprites beside the spine */
+.flow__art { display: grid; place-items: center; width: 64px; line-height: 0; }
+.flow__art > .px { display: block; }
+
+/* the settle scene, under the last on-chain step: a small stage whose edge takes the verdict's colour
+   (blue when the honest provider is paid, raspberry when the cheat is slashed), like the outcome cells */
+.flow__row--settle { min-height: 0; padding-block: 0 var(--sp-8); }
+.flow__stage {
+  grid-column: 1;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-16);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  background: var(--card);
+  transition: box-shadow var(--dur-ui) var(--ease-ui);
+}
+.flow__stage.is-honest { box-shadow: inset 0 0 0 1px var(--blue); border-color: var(--blue); }
+.flow__stage.is-cheat  { box-shadow: inset 0 0 0 1px var(--alert); border-color: var(--alert); }
+.flow__settle { display: block; width: 192px; height: 96px; line-height: 0; }
+.flow__settle > .px { display: block; }
+
+/* the job token, riding the spine (moved by moveUnits in whole art px) */
+.flow__token {
+  position: absolute;
+  top: 0;
+  left: calc(var(--spine-x) - 24px);
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  line-height: 0;
+  pointer-events: none;
+}
+.flow__token > .px { display: block; }
+
+@media (max-width: 1023.98px) {
+  .flow__lanes { --spine-x: 24px; }
+  .flow__heads { grid-template-columns: minmax(0, 1fr); padding: var(--sp-12) 0 var(--sp-12) calc(48px + 64px + 24px); }
+  .flow__lanehead { display: block; min-height: 24px; }
+  .flow__lanehead > .flow__swatch { display: inline-block; margin-right: var(--sp-8); vertical-align: -1px; }
+  .flow__lanehead--off { padding-left: 0; }
+  .flow__row { grid-template-columns: 48px 64px minmax(0, 1fr); column-gap: var(--sp-12); min-height: 0; }
+  .flow__steps > .flow__row:first-child { min-height: 0; }
+  .flow__row--on .flow__card, .flow__row--off .flow__card { grid-column: 3; }
+  .flow__row--on .flow__art, .flow__row--off .flow__art { grid-column: 2; }
+  .flow__row--on .flow__art { min-height: 96px; }
+  .flow__lanetag { display: block; }
+  .flow__stage { grid-column: 3; }
+}
+@media (max-width: 767.98px) {
+  .flow__heads { padding-left: 0; }
+  .flow__row { column-gap: var(--sp-8); }
+  .flow__card { grid-template-columns: minmax(0, 1fr); padding: var(--sp-12) var(--sp-16); }
+  .flow__card--on { padding-left: 13px; }
+  .flow__n { display: none; }
+}
+
+/* ---- C · outcomes ---------------------------------------------------------------------------- */
+.flow__outcomes { margin-top: var(--seam); }
+.flow__outcome { gap: var(--sp-16); }
+.flow__outcome--honest { box-shadow: inset 0 0 0 2px var(--blue); }
+.flow__outcome--cheat  { box-shadow: inset 0 0 0 2px var(--alert); }
+.flow__outcome--honest > .icon { color: var(--blue); }
+.flow__outcome--cheat > .icon  { color: var(--alert); }
+.flow__outcome > .icon { display: block; }
+.flow__list { margin: var(--sp-8) 0 0; padding: 0; list-style: none; }
+.flow__list li {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  padding-block: var(--sp-12);
+  border-top: 1px solid var(--hairline);
+}
+.flow__li-n { color: var(--text-muted); line-height: var(--lh-body); }
+.flow__outcome--honest .flow__list li:last-child { color: var(--blue); }
+.flow__outcome--cheat .flow__list li:last-child { color: var(--alert); }
+.flow__outcome .flow__list li:last-child .flow__li-n { color: inherit; }
+
+/* ---- D · note + demo details ----------------------------------------------------------------- */
+.flow__note {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-40);
+  margin-top: var(--seam);
+}
+.flow__note-text { max-width: var(--measure-lead); }
+.flow__note-body { margin-top: var(--sp-8); color: var(--text-soft); }
+.flow__cite { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-4) var(--sp-12); margin-top: var(--sp-16); color: var(--text-soft); }
+.flow__cite .link { color: var(--text); }
+.flow__cite .link--icon > .icon { margin-top: 5px; }          /* 10-px glyph centred on the 20-px line */
+.flow__arxiv { color: var(--text-muted); font-size: var(--fs-small); }
+.flow__demo { display: flex; flex-direction: column; gap: var(--sp-16); align-items: flex-start; }
+.flow__details { margin: 0; color: var(--text-soft); }
+@media (min-width: 1280px) {
+  .flow__note { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; }
+  .flow__note-text { grid-column: 1 / span 7; }
+  .flow__demo { grid-column: 8 / span 5; align-items: flex-end; text-align: right; }
+}

@@ -1,0 +1,67 @@
+/* The type scale · design-spec §2.1. Owner: layout-core.
+   Three discrete scales (lg ≥1024, md 768–1023, sm <768), switched in tokens.css; not fluid.
+   Grotesk 500 for every heading and UI label (one weight, hierarchy by size); Plex 400 body;
+   JetBrains Mono 400 for data and labels, uppercase mono gets +0.08em. */
+
+@layer bp.type {
+.display,
+.h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.display { font-size: var(--fs-display); line-height: var(--lh-display); letter-spacing: var(--ls-display); }
+.h2      { font-size: var(--fs-h2);      line-height: var(--lh-h2);      letter-spacing: var(--ls-h2); }
+.h3      { font-size: var(--fs-h3);      line-height: var(--lh-h3);      letter-spacing: var(--ls-h3); }
+.h4      { font-size: var(--fs-h4);      line-height: var(--lh-h4);      letter-spacing: 0; }
+.h5      { font-size: var(--fs-h5);      line-height: var(--lh-h5);      letter-spacing: 0; }
+.h6      { font-size: var(--fs-h6);      line-height: var(--lh-h6);      letter-spacing: var(--ls-h6); }
+
+.lead {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
+  color: var(--text-soft);
+}
+.body  { font-family: var(--font-body); font-weight: 400; font-size: var(--fs-body);  line-height: var(--lh-body); }
+.small { font-family: var(--font-body); font-weight: 400; font-size: var(--fs-small); line-height: var(--lh-small); }
+
+.num-xl,
+.num-l,
+.mono,
+.eyebrow,
+.micro {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.num-xl { font-size: var(--fs-num-xl); line-height: var(--lh-num-xl); letter-spacing: var(--ls-num-xl); }
+.num-l  { font-size: var(--fs-num-l);  line-height: var(--lh-num-l);  letter-spacing: 0; }
+.mono   { font-size: var(--fs-mono);   line-height: var(--lh-mono);   letter-spacing: 0; }
+.eyebrow,
+.micro  { text-transform: uppercase; letter-spacing: var(--ls-caps); }
+.eyebrow { font-size: var(--fs-eyebrow); line-height: var(--lh-eyebrow); }
+.micro   { font-size: var(--fs-micro);   line-height: var(--lh-micro); }
+
+/* weights the spec allows besides the defaults */
+.w-500 { font-weight: 500; }            /* Plex 500: active tab label; Mono 500: ACCEPTED */
+
+/* colour helpers (read the scope-aware tokens) */
+.t-soft   { color: var(--text-soft); }
+.t-muted  { color: var(--text-muted); }
+.t-accent { color: var(--accent-text); }
+.t-blue   { color: var(--blue); }
+.t-alert  { color: var(--alert); }
+.t-ink    { color: var(--text); }
+
+/* measures (design §2.1: h2 ≤880 at lg, body 36–44em ≈ 560px, leads 640) */
+.measure-h2   { max-width: var(--measure-h2); }
+.measure-lead { max-width: var(--measure-lead); }
+.measure-body { max-width: var(--measure-body); }
+
+.center { text-align: center; }
+.center.measure-h2, .center.measure-lead, .center.measure-body { margin-inline: auto; }
+
+} /* @layer bp.type */

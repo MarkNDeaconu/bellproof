@@ -1,0 +1,173 @@
+/* Nav · design-spec §4.1. Owner: layout-core.
+   lg  | logo 160 | 5 items | …spacer… | Get in touch | ▶ Watch the demo (ink) |
+   md  | logo 160 | Get in touch (flex, centred) | ▶ Watch the demo (ink) | ⣿ 48 |
+   sm  | mark 48 | ▶ Watch the demo (ink, flex, centred) | ⣿ 48 |
+   open (md/sm) | logo | MENU (micro, flex) | × |  + a panel sliding in from the right. */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+.nav__bar { display: flex; height: var(--nav-h); }
+
+.nav__cell {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: var(--sp-8);
+  height: 100%;
+  padding: 0 var(--sp-16);
+  border-right: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--fs-h6);
+  line-height: var(--lh-h6);
+  letter-spacing: var(--ls-h6);
+  white-space: nowrap;
+  transition: background-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui);
+}
+.nav__cell:focus-visible { outline-offset: -4px; }
+a.nav__cell:hover,
+button.nav__cell:hover { background: var(--paper); }
+
+/* logo: the pixel bell at 2px/art px (24×22) + the wordmark, gap 10 */
+.nav__logo { width: 160px; gap: 10px; }
+.nav__mark { display: flex; color: var(--ink); }   /* 48 − 22 = 26 */
+.nav__mark svg { display: block; }
+.nav__wordmark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: 0;
+}
+
+.nav__primary { display: flex; height: 100%; }
+.nav__items { display: flex; height: 100%; }
+.nav__items > li { display: flex; height: 100%; }
+/* scroll-spy: the section under the viewport centre lifts its tab to paper */
+.nav__link[aria-current] { background: var(--paper); }
+
+.nav__spacer { flex: 1; min-width: 0; border-right: 1px solid var(--line); }
+
+/* the solid ink cell (the only inverted cell) */
+.nav__demo {
+  gap: var(--sp-8);
+  border-right: 0;
+  background: var(--action);
+  color: var(--on-dark);
+  --focus-ring: var(--on-dark-accent);
+}
+a.nav__demo:hover { background: var(--action-hover); }
+.nav__demo .icon { flex: none; display: block; }   /* 48 − 32 = 16: centred on whole px */
+
+.nav__menu-label,
+.nav__toggle { display: none; }
+
+/* 1024–1199: the full row is ~1100px wide at 16px padding, so the cells tighten to 12px */
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  .nav__cell { padding: 0 12px; }
+  .nav__logo { width: 144px; }
+}
+
+/* ---- md / sm: collapse into the menu button ------------------------------------------------- */
+@media (max-width: 1023.98px) {
+  .nav__primary,
+  .nav__spacer { display: none; }
+  .nav__contact { flex: 1; justify-content: center; }
+  .nav__toggle {
+    display: inline-flex;
+    justify-content: center;
+    width: 48px;
+    padding: 0;
+    border-right: 0;
+  }
+  .nav__toggle-icon { display: flex; }                 /* 48 − 28 = 20: whole px; morph() swaps the svg inside */
+  .nav__toggle-icon > svg { display: block; }
+
+  /* open: | logo | MENU | × | */
+  .nav.is-open .nav__contact,
+  .nav.is-open .nav__demo { display: none; }
+  .nav.is-open .nav__menu-label {
+    display: inline-flex;
+    flex: 1;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: var(--fs-micro);
+    line-height: var(--lh-micro);
+    letter-spacing: var(--ls-caps);
+    text-transform: uppercase;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .nav__logo { width: 48px; padding: 0 0 0 12px; }        /* 48 − 1px divider: centring would put the mark at 11.5 */
+  .nav__wordmark {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .nav__contact { display: none; }
+  .nav__demo { flex: 1; justify-content: center; }
+}
+
+/* ---- the menu panel (md/sm): full height under the bar, slides in from the right ---------- */
+.nav__panel { display: none; }
+@media (max-width: 1023.98px) {
+  .nav__panel {
+    position: fixed;
+    top: var(--nav-total);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    background: var(--card);
+    box-shadow: var(--shadow-menu);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform var(--dur-panel) var(--ease-ui), visibility 0s linear var(--dur-panel);
+  }
+  .nav.is-open .nav__panel {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--dur-panel) var(--ease-ui);
+  }
+}
+:root[data-motion="reduced"] .nav__panel { transition: none !important; }
+
+.nav__rows > li { border-bottom: 1px solid var(--line); }
+.nav__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-16);
+  height: 64px;
+  padding: 0 var(--gutter);
+  color: var(--text);
+  transition: background-color var(--dur-ui) var(--ease-ui);
+}
+.nav__row:hover,
+.nav__row[aria-current] { background: var(--paper); }
+.nav__row:focus-visible { outline-offset: -4px; }
+.nav__row-label { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-h4); line-height: var(--lh-h4); }
+.nav__row .btn__icon { margin-right: 8px; }
+
+.nav__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  margin-top: auto;
+  padding: var(--sp-16) var(--gutter);
+  border-top: 1px solid var(--line);
+}

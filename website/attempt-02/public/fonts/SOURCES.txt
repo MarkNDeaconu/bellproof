@@ -1,0 +1,9 @@
+Self-hosted fonts (layout-core, revision 1 LC1). All SIL Open Font License 1.1 (licence texts beside them).
+Full (unsubset) woff2 files, so the site's ⁰¹³ ≈ ≤ ← → λ Δ − ± · … glyphs are present.
+
+SpaceGrotesk-500.woff2   42 796 B  floriankarsten/space-grotesk @master  fonts/woff2/static/SpaceGrotesk-Medium.woff2   sha256 f20a85be4c8a74ddad94d46fcce503666498855e5a87755d75cd728d801bbe58
+IBMPlexSans-400.woff2    63 020 B  npm @ibm/plex-sans@1.1.0  fonts/complete/woff2/IBMPlexSans-Regular.woff2                 sha256 ba711a3085ff9f27440b6b9c4550cfc47c97bf36591d5da958b975bb3add8c1a
+IBMPlexSans-500.woff2    66 740 B  npm @ibm/plex-sans@1.1.0  fonts/complete/woff2/IBMPlexSans-Medium.woff2                  sha256 5660f8a658f8bb50dbc005232f885eadffd2bc1c235c4f6fbb63469d1f9cde6d
+JetBrainsMono-400.woff2  92 164 B  JetBrains/JetBrainsMono @v2.304  fonts/webfonts/JetBrainsMono-Regular.woff2         sha256 a9cb1cd82332b23a47e3a1239d25d13c86d16c4220695e34b243effa999f45f2
+JetBrainsMono-500.woff2  93 824 B  JetBrains/JetBrainsMono @v2.304  fonts/webfonts/JetBrainsMono-Medium.woff2          sha256 086c48dfbea9ddaff1320f7e09399b8e2924e88ce67453721255db3bdbb5a353
+Total 358 544 B (budget 400 KB). Fetched via cdn.jsdelivr.net mirrors of the upstream repos on 2026-10-12.

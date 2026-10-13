@@ -1,0 +1,100 @@
+/* Cost · design-spec §5.4. Owner: sections-1.
+   Four beats separated by hairlines (80 apart): A glitch cells · B cascade (bars, lane, connector, FP/FN) ·
+   C stats · D history. */
+
+.cost { padding: var(--sec-pad-top) 0 var(--seam); }
+.cost__head { display: flex; flex-direction: column; align-items: flex-start; }
+.cost__lead { margin-top: var(--sp-24); }
+.cost__beat { margin-top: var(--seam); padding-top: var(--seam); border-top: 1px solid var(--line); }
+
+/* ---- A · glitch cells ----------------------------------------------------------------------------- */
+.cost__cells { margin-top: var(--seam); --cols-md: 2; }
+.cost__cell { min-height: 240px; }
+.cost__ico { display: block; line-height: 0; }
+.cost__ico .px { display: block; }
+
+/* ---- B · cascade ---------------------------------------------------------------------------------- */
+.cost__cascade { display: flex; flex-direction: column; align-items: flex-start; }
+.cost__h3 { margin-top: var(--sp-16); }
+.cost__body { margin-top: var(--sp-16); }
+.cost__stairs { width: 100%; margin-top: var(--sp-64); }
+.cost__bars {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+  background: none;
+  border: 0;
+}
+.cost__bar {
+  min-height: calc(var(--n) * 80px + 16px);
+  padding: var(--sp-16);
+  gap: var(--sp-4);
+  --cell-bg: var(--paper);
+  border: 1px solid var(--line);
+  border-bottom: 0;
+}
+.cost__bar + .cost__bar { border-left: 0; }
+.cost__bar--1 { --cell-bg: var(--ink); color: var(--on-dark); border-color: var(--ink); }
+.cost__bar--1 .cost__bar-body { color: var(--on-dark-body); }
+.cost__bar--5 { --cell-bg: var(--alert-tint); }
+.cost__bar-n { color: var(--text-muted); }
+.cost__bar--1 .cost__bar-n { color: var(--on-dark-muted); }
+.cost__bar-body { color: var(--text-soft); }
+.cost__bar .h5 { margin-top: var(--sp-4); }
+
+.cost__lane {
+  position: relative;
+  height: 96px;
+  border-top: 1px solid var(--line);
+  overflow: hidden;
+}
+.cost__coin-fig { position: absolute; inset: 0; margin: 0; }
+.cost__coin { position: absolute; left: 0; bottom: 0; will-change: transform; }
+.cost__connector {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-16);
+  padding-top: var(--sp-8);
+  border-top: 1px solid var(--alert);
+  color: var(--text-soft);
+}
+.cost__conn-r { text-align: right; }
+.cost__errors { margin-top: var(--sp-64); width: 100%; }
+.cost__err { min-height: 240px; }
+
+/* ---- C · stats ------------------------------------------------------------------------------------- */
+.cost__stat { min-height: 280px; }
+.cost__num { font-variant-numeric: tabular-nums; }
+.cost__sources { margin-top: var(--sp-16); max-width: 880px; }
+.cost__closing { margin-top: var(--seam); }
+
+/* ---- D · history ----------------------------------------------------------------------------------- */
+.cost__history { margin-top: var(--sp-32); }
+.cost__hist { min-height: 320px; gap: var(--sp-12); }
+.cost__hist .h5 { margin-top: var(--sp-8); }
+.cost__hist .cell__body { margin-top: var(--sp-4); }
+
+@media (max-width: 1023.98px) {
+  .cost__cell, .cost__err { min-height: 200px; }
+  .cost__stat { min-height: 240px; }
+  .cost__hist { min-height: 0; }
+  .cost__bar { min-height: calc(var(--n) * 64px + 32px); padding: var(--sp-12); }
+}
+
+/* sm: the staircase becomes a horizontal bar chart (widths 20–100 %); the coin plays its story in place */
+@media (max-width: 767.98px) {
+  .cost__stairs { margin-top: var(--sp-40); }
+  .cost__bars { display: flex; flex-direction: column; gap: var(--sp-8); }
+  .cost__bar {
+    width: calc(var(--n) * 20%);
+    min-width: 200px;
+    min-height: 0;
+    border: 1px solid var(--line);
+  }
+  .cost__bar--1 { border-color: var(--ink); }
+  .cost__lane { margin-top: var(--sp-24); height: 96px; border-top: 0; }
+  .cost__coin { left: 0 !important; }
+  .cost__connector { flex-direction: column; gap: var(--sp-4); }
+  .cost__conn-r { text-align: left; }
+  .cost__errors { margin-top: var(--sp-40); }
+  .cost__stat { min-height: 0; }
+}

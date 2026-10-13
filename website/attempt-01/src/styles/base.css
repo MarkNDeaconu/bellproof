@@ -1,0 +1,99 @@
+/* Reset, fonts, body, focus ring, skip link, .vh · design-spec §2, §4.1, §6. Owner: layout-core.
+   Fonts: Space Grotesk 500, IBM Plex Sans 400/500, JetBrains Mono 400/500 (latin), font-display: swap.
+   They are linked from index.html (Google Fonts css2) until the five woff2 files land in public/fonts/
+   (see README-layout.md § Fonts for the self-hosted @font-face block that replaces the link). */
+
+@layer bp.base {
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--nav-total) + 24px);   /* anchors land below the sticky nav */
+  overflow-x: clip;
+}
+/* No CSS scroll-behavior: it would also animate window.scrollTo() (QA captures). In-page links scroll
+   smoothly through nav.ts instead, and jump under reduced motion. */
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--card);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  font-kerning: normal;
+}
+
+h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, ol, ul { margin: 0; }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 500; font-size: inherit; line-height: inherit; text-wrap: balance; }
+ol[role="list"], ul[role="list"] { list-style: none; padding: 0; }
+img, video { display: block; max-width: 100%; height: auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+p { text-wrap: pretty; }
+strong, b { font-weight: inherit; }   /* hierarchy is size and colour, never bold (design §2) */
+table { border-collapse: collapse; border-spacing: 0; }
+[hidden] { display: none !important; }
+
+::selection { background: var(--ramp-0); color: var(--ink); }
+
+/* ---- focus: 2px ring, 2px offset, blue on light, azure on dark (design §1.3, §4.2) --------- */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+/* full-height cells (nav, citation cells, footer columns) ring inside their own box so the ring is
+   never clipped by a neighbour or the viewport edge */
+.focus-inset:focus-visible { outline-offset: -4px; }
+/* programmatic focus targets (the skip link lands on <main tabindex="-1">) never show a ring */
+[tabindex="-1"]:focus { outline: none; }
+
+/* ---- highlight spans (the brief's **bold**): same weight, blue (design §2.1) --------------- */
+.em { color: var(--accent-text); }
+
+/* ---- visually hidden ------------------------------------------------------------------------ */
+.vh {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- skip link: primary-button styled, appears on focus at the top-left (design §4.1) ------ */
+.skip {
+  position: fixed;
+  top: 8px; left: 8px;
+  z-index: 1000;
+  display: inline-flex; align-items: center;
+  height: 40px; padding: 0 16px;
+  border-radius: var(--r-control);
+  background: var(--action); color: var(--on-dark);
+  font-family: var(--font-display); font-weight: 500;
+  font-size: var(--fs-h6); line-height: var(--lh-h6); letter-spacing: var(--ls-h6);
+  transform: translateY(calc(-100% - 16px));
+}
+.skip:focus-visible { transform: none; outline-color: var(--focus); }
+.skip:focus:not(:focus-visible) { transform: none; }
+
+/* Links whose href is still a content placeholder (`[Demo link]`, `mailto:[Contact email]`) keep their
+   look; nav.ts guards the click (no navigation) and sets a tooltip with the placeholder's name. */
+
+/* ---- scroll lock while the mobile menu is open ------------------------------------------- */
+html.is-locked { overflow: hidden; }
+
+.nowrap { white-space: nowrap; }
+
+} /* @layer bp.base */

@@ -1,0 +1,46 @@
+{
+  "v": 4,
+  "createdOnFiles": {"v": 1, "at": "2026-10-09T12:00:00Z"},
+  "lists": "css",
+  "title": "Bellproof — Verified Quantum Compute",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "cloud-today",
+    "trust-classical",
+    "quantum-cloud",
+    "example",
+    "checks-fail",
+    "paradox",
+    "silent",
+    "history",
+    "cascade",
+    "pharma-numbers",
+    "two-errors",
+    "layer",
+    "clients",
+    "flow",
+    "certificate",
+    "games",
+    "compiler",
+    "protocol",
+    "guarantees",
+    "with-without",
+    "demo",
+    "close"
+  ],
+  "sections": {
+    "s1": {"description": "Delegated computing today: we trust the cloud because we can check its answers", "start": "cover"},
+    "s2": {"description": "Quantum in the cloud: a classical answer with a quantum witness cannot be checked", "start": "quantum-cloud"},
+    "s3": {"description": "The cost of a wrong quantum answer", "start": "silent"},
+    "s4": {"description": "The verification layer: clients, smart contracts and certificates", "start": "layer"},
+    "s5": {"description": "How we verify: compiled nonlocal games", "start": "games"},
+    "s6": {"description": "Wrap-up: the running example verified, the demo and the close", "start": "with-without"}
+  },
+  "faces": {
+    "space-grotesk": {"family": "Space Grotesk", "href": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..700&display=swap"},
+    "ibm-plex-sans": {"family": "IBM Plex Sans", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"}
+  },
+  "designSystems": []
+}

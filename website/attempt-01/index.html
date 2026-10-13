@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en" data-motion="full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- meta: verbatim from src/content/meta.ts (content §1); keep the two in sync -->
+  <title>Bellproof · Verified quantum computation, settled on-chain</title>
+  <meta name="description" content="Bellproof verifies quantum cloud results with compiled nonlocal games. Providers get paid only when an answer passes, and anyone can audit the certificate." />
+  <meta name="theme-color" content="#0E1424" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Bellproof" />
+  <meta property="og:title" content="Bellproof" />
+  <meta property="og:description" content="Delegate quantum work. Verify every answer." />
+  <meta property="og:image" content="./og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <!-- Fonts (design §2): Space Grotesk 500, IBM Plex Sans 400/500, JetBrains Mono 400/500, swap.
+       Linked until the five latin woff2 files are in public/fonts/ (README-layout.md § Fonts). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500&display=swap" />
+  <!-- integrator (queue #12): without JavaScript the first-paint hero copy stays visible and reveals are not clipped -->
+  <noscript><style>.hero-shell__text,.hero-shell__fridge{visibility:visible!important}[data-reveal]{clip-path:none!important;transform:none!important}.hero-shell .rail,.hero-shell .arc{opacity:1!important}.hero-shell__fridge .px{display:none}</style></noscript>
+</head>
+<body>
+  <!-- layout-core owns this file: structure only. Every visible string comes from src/content/strings.ts
+       via data-str (fillStrings re-applies it at boot; the static text is a first-paint copy, checked
+       against strings.ts by qa/layout-core/check-static-strings.ts).
+       Section contract (README-layout.md): layout-core owns each <section> element (id, class, data-tint,
+       seam); the section agent owns everything inside it and replaces the skeleton shell. -->
+  <a class="skip" href="#main" data-str="ui.skipLink">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__bar">
+      <a class="nav__cell nav__logo" href="#top" data-str-href="nav.logo.href">
+        <span class="nav__mark"><i data-icon="logo-mark" data-size="2"></i></span>
+        <span class="nav__wordmark" data-str="nav.logo.label">Bellproof</span>
+      </a>
+      <nav class="nav__primary" aria-label="Main">
+        <ul class="nav__items" role="list">
+          <li><a class="nav__cell nav__link" href="#flip" data-spy="flip" data-str="nav.items.0.label" data-str-href="nav.items.0.href">Why verify</a></li>
+          <li><a class="nav__cell nav__link" href="#verify" data-spy="verify" data-str="nav.items.1.label" data-str-href="nav.items.1.href">How it works</a></li>
+          <li><a class="nav__cell nav__link" href="#flow" data-spy="flow" data-str="nav.items.2.label" data-str-href="nav.items.2.href">Contracts</a></li>
+          <li><a class="nav__cell nav__link" href="#clients" data-spy="clients" data-str="nav.items.3.label" data-str-href="nav.items.3.href">Who it's for</a></li>
+          <li><a class="nav__cell nav__link" href="#research" data-spy="research" data-str="nav.items.4.label" data-str-href="nav.items.4.href">Research</a></li>
+        </ul>
+      </nav>
+      <span class="nav__spacer" aria-hidden="true"></span>
+      <a class="nav__cell nav__contact" href="mailto:[Contact email]" data-str-href="nav.contact.href"><span data-str="nav.contact.label">Get in touch</span></a>
+      <a class="nav__cell nav__demo" data-hop="press" href="[Demo link]" data-str-href="nav.demo.href"><i data-icon="ui-play"></i><span data-str="nav.demo.label">Watch the demo</span></a>
+      <span class="nav__cell nav__menu-label" aria-hidden="true" data-str="ui.menuLabel">MENU</span>
+      <button class="nav__cell nav__toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu" data-str-aria="ui.menuOpen">
+        <span class="nav__toggle-icon"><i data-icon="ui-menu"></i></span>
+      </button>
+    </div>
+    <nav class="nav__panel" id="nav-menu" aria-label="Main">
+      <ul class="nav__rows" role="list">
+        <li><a class="nav__row" data-hop="step" href="#flip" data-spy="flip" data-str-href="nav.items.0.href"><span class="nav__row-label" data-str="nav.items.0.label">Why verify</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a></li>
+        <li><a class="nav__row" data-hop="step" href="#verify" data-spy="verify" data-str-href="nav.items.1.href"><span class="nav__row-label" data-str="nav.items.1.label">How it works</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a></li>
+        <li><a class="nav__row" data-hop="step" href="#flow" data-spy="flow" data-str-href="nav.items.2.href"><span class="nav__row-label" data-str="nav.items.2.label">Contracts</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a></li>
+        <li><a class="nav__row" data-hop="step" href="#clients" data-spy="clients" data-str-href="nav.items.3.href"><span class="nav__row-label" data-str="nav.items.3.label">Who it's for</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a></li>
+        <li><a class="nav__row" data-hop="step" href="#research" data-spy="research" data-str-href="nav.items.4.href"><span class="nav__row-label" data-str="nav.items.4.label">Research</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a></li>
+      </ul>
+      <div class="nav__actions">
+        <a data-hop="step" class="btn btn--outline btn--block" href="mailto:[Contact email]" data-str-href="nav.contact.href"><span class="btn__label" data-str="nav.contact.label">Get in touch</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a>
+        <a data-hop="out" class="btn btn--primary btn--block" href="[Demo link]" data-str-href="nav.demo.href"><span class="btn__label" data-str="nav.demo.label">Watch the demo</span><span class="btn__icon"><i data-icon="ui-external-sm"></i></span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- 1 · Hero · sections-1 (top.ts) -->
+    <section id="top" class="sec sec--top" data-tint="card">
+      <div class="hero-shell">
+        <svg class="arc" viewBox="0 0 960 960" aria-hidden="true"><circle class="arc__front" cx="480" cy="480" r="479.5" /><circle class="arc__back" cx="480" cy="480" r="455.5" /></svg>
+        <div class="rail rail--left"><span class="dot hero-shell__arcdot"></span></div>
+        <div class="hero-shell__main">
+          <div class="hero-shell__text">
+            <h1 class="display" data-str="top.h1">Verified quantum computation, settled on-chain.</h1>
+            <p class="lead" data-str="top.lead">A verification layer between the people who need quantum answers and the clouds that compute them. Providers get paid only when the answer checks out.</p>
+            <div class="btn-row">
+              <a data-hop="step" class="btn btn--primary" href="#verify" data-str-href="top.ctas.primary.href"><span class="btn__label" data-str="top.ctas.primary.label">See how it works</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a>
+              <a data-hop="out" class="btn btn--outline" href="[Demo link]" data-str-href="top.ctas.secondary.href"><span class="btn__label" data-str="top.ctas.secondary.label">Watch the demo</span><span class="btn__icon"><i data-icon="ui-external-sm"></i></span></a>
+            </div>
+            <p class="mono t-soft hero-shell__ticker"><span data-str="top.ticker">job #0412 · ΔE = −12.4 ± 1.0 kcal/mol · test rounds passed · ACCEPTED</span><span class="tag-illustrative" data-str="common.illustrative">illustrative</span></p>
+            <a class="pill" data-hop="step" href="[Demo link]" data-str-href="top.pill.href"><span class="pill__tile"><span class="px" data-piece="placeholder" data-variant="sm" data-decorative></span></span><span class="pill__label" data-str="top.pill.label">Built at [Hackathon] 2026 · Watch one job, two providers</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a>
+          </div>
+          <div class="hero-shell__fridge"><span class="px" data-piece="placeholder" data-decorative></span></div>
+        </div>
+        <div class="rail rail--right"></div>
+      </div>
+      <div class="cells cells--flush strip">
+        <div class="cell cell--paper strip__label"><p class="h5" data-str="top.strip.label">Built on published research</p></div>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/1804.01082" data-str-href="top.strip.cells.0.href"><span class="mono" data-str="top.strip.cells.0.name">Mahadev</span><span class="micro t-muted" data-str="top.strip.cells.0.venue">FOCS 2018</span><span class="strip__glyph"><i data-icon="ui-external"></i></span></a>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/2203.15877" data-str-href="top.strip.cells.1.href"><span class="mono" data-str="top.strip.cells.1.name">KLVY</span><span class="micro t-muted" data-str="top.strip.cells.1.venue">STOC 2023</span><span class="strip__glyph"><i data-icon="ui-external"></i></span></a>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/2303.01545" data-str-href="top.strip.cells.2.href"><span class="mono" data-str="top.strip.cells.2.name">Natarajan–Zhang</span><span class="micro t-muted" data-str="top.strip.cells.2.venue">FOCS 2023</span><span class="strip__glyph"><i data-icon="ui-external"></i></span></a>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/2609.38060" data-str-href="top.strip.cells.3.href"><span class="mono" data-str="top.strip.cells.3.name">Holler–Natarajan</span><span class="micro t-muted" data-str="top.strip.cells.3.venue">arXiv 2026</span><span class="strip__glyph"><i data-icon="ui-external"></i></span></a>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/2604.23516" data-str-href="top.strip.cells.4.href"><span class="mono" data-str="top.strip.cells.4.name">Mohammed–Abadi–Mahdi</span><span class="micro t-muted" data-str="top.strip.cells.4.venue">CCS 2026</span><span class="strip__glyph"><i data-icon="ui-external"></i></span></a>
+      </div>
+    </section>
+
+    <!-- 2 · Trust · sections-1 (trust.ts) -->
+    <section id="trust" class="sec sec--trust" data-tint="paper">
+      <div class="wrap shell">
+        <header class="shell__head shell__head--center">
+          <p class="eyebrow" data-reveal="1" data-str="trust.eyebrow">01 · Delegated compute</p>
+          <h2 class="h2" data-reveal="2" data-str="trust.h2">We trust the cloud because we can check it.</h2>
+          <p class="lead" data-reveal="3" data-str="trust.lead">We already rent storage, GPUs and whole pipelines. It feels safe because checking an answer costs far less than computing it.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 3 · Flip + paradox band · sections-1 (flip.ts) -->
+    <section id="flip" class="sec sec--flip" data-tint="card">
+      <div class="wrap shell">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="flip.eyebrow">02 · Quantum in the cloud</p>
+          <h2 class="h2" data-reveal="2" data-str="flip.h2">Quantum hands back one number. Good luck checking it.</h2>
+          <p class="lead" data-reveal="3" data-str="flip.lead">IBM Quantum, Amazon Braket and Azure Quantum already rent time on real quantum processors. Most organizations will rent, the way they rent GPUs today. What comes back is one classical number, with a quantum state behind it that only a quantum computer can hold.</p>
+        </header>
+        <div class="cells"><div class="cell cell--paper shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+      <div id="paradox" class="band grid-colour" data-tint="blue">
+        <div class="wrap shell shell--band">
+          <header class="shell__head">
+            <p class="eyebrow" data-reveal="1" data-str="flip.paradox.eyebrow">The verification paradox</p>
+            <p class="display shell__statement" data-reveal="2" data-str="flip.paradox.statement">If you could check the answer classically, you wouldn't need the quantum computer.</p>
+            <p class="lead" data-reveal="3" data-str="flip.paradox.sub">That gap is what Bellproof closes.</p>
+          </header>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · Cost · sections-1 (cost.ts) -->
+    <section id="cost" class="sec sec--cost" data-tint="card">
+      <div class="wrap shell">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="cost.eyebrow">03 · The cost of a wrong answer</p>
+          <h2 class="h2" data-reveal="2" data-str="cost.h2">A wrong answer looks exactly like a right one.</h2>
+          <p class="lead" data-reveal="3" data-str="cost.lead">None of these raises an error. Every one returns a plausible number.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 5 · Layer · sections-2 (layer.ts) -->
+    <section id="layer" class="sec sec--layer" data-tint="paper">
+      <div class="wrap shell">
+        <header class="shell__head shell__head--center">
+          <p class="eyebrow" data-reveal="1" data-str="layer.eyebrow">04 · The verification layer</p>
+          <h2 class="h2" data-reveal="2" data-str="layer.h2">Bellproof checks the answer before anyone gets paid.</h2>
+          <p class="lead" data-reveal="3" data-str="layer.lead">A verification layer between clients and quantum clouds, settled by smart contracts. Clients need no quantum hardware. Providers need no brand trust.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 6 · Clients · sections-2 (clients.ts) -->
+    <section id="clients" class="sec sec--clients" data-tint="card">
+      <div class="wrap shell">
+        <header class="shell__head shell__head--row">
+          <div>
+            <p class="eyebrow" data-reveal="1" data-str="clients.eyebrow">05 · Who it's for</p>
+            <h2 class="h2 measure-h2" data-reveal="2" data-str="clients.h2">Built for decisions that ride on one number.</h2>
+            <p class="lead measure-lead shell__lead" data-reveal="3" data-str="clients.lead">If you have a decision gated on one number, expensive steps downstream, and no quantum computer in-house, Bellproof is for you.</p>
+          </div>
+          <a data-hop="step" class="btn btn--outline" href="mailto:[Contact email]" data-str-href="clients.cta.href"><span class="btn__label" data-str="clients.cta.label">Talk to us</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 7 · Flow · sections-2 (flow.ts) -->
+    <section id="flow" class="sec sec--flow" data-tint="paper">
+      <div class="wrap shell">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="flow.eyebrow">06 · Smart contracts</p>
+          <h2 class="h2" data-reveal="2" data-str="flow.h2">Seven steps. The money moves last.</h2>
+          <p class="lead" data-reveal="3" data-str="flow.lead">Money, commitments and verdicts live on-chain. Quantum work and heavy math stay off-chain. Anyone can audit the trail.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 8 · Verify + research list · sections-3 (verify.ts). Keep id="research" (the nav links to it). -->
+    <section id="verify" class="sec sec--verify" data-tint="card">
+      <div class="wrap shell">
+        <header class="shell__head shell__head--center">
+          <p class="eyebrow" data-reveal="1" data-str="verify.eyebrow">07 · How we verify</p>
+          <h2 class="h2" data-reveal="2" data-str="verify.h2">A game only quantum players can win.</h2>
+          <p class="lead" data-reveal="3" data-str="verify.lead">We check quantum work with nonlocal games, compiled with encryption, hidden among the real computation. Three ideas, one verdict.</p>
+        </header>
+        <div class="mosaic mosaic--violet"><div class="mosaic__plate"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+        <div id="research" class="shell__sub">
+          <h3 class="h3" data-reveal="1" data-str="verify.research.h3">The papers behind it.</h3>
+          <p class="lead measure-lead" data-reveal="2" data-str="verify.research.lead">Bellproof builds on published results in classical verification of quantum computation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · Guarantees · sections-3 (guarantees.ts) -->
+    <section id="guarantees" class="sec sec--guarantees" data-tint="paper">
+      <div class="wrap shell">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="guarantees.eyebrow">08 · The certificate</p>
+          <h2 class="h2" data-reveal="2" data-str="guarantees.h2">What the certificate promises, and where it stops.</h2>
+          <p class="lead" data-reveal="3" data-str="guarantees.lead">Every passing job mints a certificate. It travels with the result, so anyone downstream can check it.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 10 · CTA band · sections-3 (cta.ts) -->
+    <section id="cta" class="sec sec--cta grid-colour" data-tint="ink">
+      <div class="wrap shell shell--cta">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="cta.eyebrow">Bellproof</p>
+          <h2 class="display" data-reveal="2" data-str="cta.h2">Delegate quantum work. Verify every answer.</h2>
+          <p class="lead" data-reveal="3" data-str="cta.lead">One job, two providers. Watch the honest one get paid and the cheater get slashed.</p>
+        </header>
+        <div class="cells cells--3">
+          <div class="cell shell__cta-cell">
+            <span class="px" data-piece="placeholder" data-variant="sm" data-decorative></span>
+            <h3 class="h4" data-str="cta.cells.0.title">Watch the demo</h3>
+            <p class="cell__body cell__foot" data-str="cta.cells.0.body">One job, two providers, one verdict each.</p>
+            <a data-hop="out" class="btn btn--ghost-on-dark" href="[Demo link]" data-str-href="cta.cells.0.button.href"><span class="btn__label" data-str="cta.cells.0.button.label">Watch the demo</span><span class="btn__icon"><i data-icon="ui-external-sm"></i></span></a>
+          </div>
+          <div class="cell shell__cta-cell">
+            <span class="px" data-piece="placeholder" data-variant="sm" data-decorative></span>
+            <h3 class="h4" data-str="cta.cells.1.title">Read the code</h3>
+            <p class="cell__body cell__foot" data-str="cta.cells.1.body">Contracts, verifier and demo, in the open.</p>
+            <a data-hop="out" class="btn btn--ghost-on-dark" href="[GitHub]" data-str-href="cta.cells.1.button.href"><span class="btn__label" data-str="cta.cells.1.button.label">Open GitHub</span><span class="btn__icon"><i data-icon="ui-external-sm"></i></span></a>
+          </div>
+          <div class="cell shell__cta-cell">
+            <span class="px" data-piece="placeholder" data-variant="sm" data-decorative></span>
+            <h3 class="h4" data-str="cta.cells.2.title">Read the research</h3>
+            <p class="cell__body cell__foot" data-str="cta.cells.2.body">Five papers, from Mahadev 2018 to CCS 2026.</p>
+            <a data-hop="step" class="btn btn--ghost-on-dark" href="#research" data-str-href="cta.cells.2.button.href"><span class="btn__label" data-str="cta.cells.2.button.label">See the papers</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a>
+          </div>
+        </div>
+        <div class="shell__cta-final">
+          <a data-hop="step" class="btn btn--primary-on-dark" href="mailto:[Contact email]" data-str-href="cta.final.href"><span class="btn__label" data-str="cta.final.label">Get in touch</span><span class="btn__icon"><i data-icon="ui-chevron"></i></span></a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 11 · Footer · layout-core (footer.ts renders the columns; strata via the bands API) -->
+  <footer id="footer" class="footer" data-tint="card">
+    <nav class="cells cells--flush footer__cols" aria-label="Footer" data-footer-cols></nav>
+    <div class="footer__sub">
+      <div class="footer__row1">
+        <ul class="footer__socials" role="list" data-footer-socials></ul>
+        <p class="h6 footer__tagline" data-str="footer.tagline">Verified quantum computation, settled on-chain.</p>
+      </div>
+      <div class="footer__row2">
+        <p class="small footer__copy" data-str="footer.copyright">Bellproof © 2026</p>
+        <div class="footer__bell" aria-hidden="true"><div class="footer__bell-mark"><i data-icon="logo-mark" data-size="20"></i></div></div>
+        <p class="small footer__built" data-str="footer.builtBy">Built at [Hackathon] by [Team]</p>
+      </div>
+    </div>
+    <div class="footer__strata" aria-hidden="true"></div>
+  </footer>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

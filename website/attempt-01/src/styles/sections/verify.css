@@ -1,0 +1,290 @@
+/* Section 8 · How we verify · #verify (design-spec §5.8). Owner: sections-3.
+   head · body ([340 sticky tab card] [feature rows]) · #research ledger.
+   Panel sizes (--panel-w, --panel-h), the sprite unit (--u) and the row mode (.is-split / .is-stack) are measured
+   and set by src/sections/verify.ts; this file only lays them out. */
+
+/* ---- shared sections-3 text link: label underlined, trailing glyph takes the 2-tick pixel step ---------------- */
+.s3-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-8);
+  color: var(--text);
+}
+.s3-link__label {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: currentColor;
+  transition: text-decoration-color var(--dur-ui) var(--ease-ui);
+}
+.s3-link:hover .s3-link__label { text-decoration-color: var(--blue); }
+.on-dark .s3-link:hover .s3-link__label { text-decoration-color: var(--on-dark-accent); }
+.s3-link__icon { display: inline-flex; line-height: 0; transition: transform var(--dur-step) steps(2, jump-start); }
+.s3-link:is(:hover, :focus-visible) .s3-link__icon { transform: translateX(4px); }
+
+/* ---- head: centred eyebrow, h2, lead ------------------------------------------------------------------------ */
+#verify .v-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-block: var(--sec-pad-top) var(--seam);
+}
+#verify .v-head .h2 { max-width: var(--measure-h2); }
+#verify .v-head .lead { max-width: 760px; margin-top: var(--sp-24); }
+
+/* ---- body: full-bleed hairlines above and below; the rows column carries the x = 380 and content-edge lines -- */
+.v-body { border-block: 1px solid var(--line); }
+.v-grid { display: grid; grid-template-columns: 340px minmax(0, 1fr); }
+.v-aside { padding: var(--sp-40) var(--sp-40) var(--sp-40) 0; }
+.v-rows { min-width: 0; border-inline: 1px solid var(--line); }
+
+/* the tab card (components .tabcard is sticky at 73px) */
+.v-tabs .tabcard__item { text-decoration: none; }
+.v-tabs .tabcard__arrow { display: inline-flex; line-height: 0; }
+
+/* ---- feature rows -------------------------------------------------------------------------------------------- */
+.frow {
+  container: frow / inline-size;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 480px;
+  padding: var(--cell-pad);
+}
+.frow + .frow { border-top: 1px solid var(--line); }
+.frow:focus { outline: none; }
+
+.frow.is-split {
+  column-gap: var(--sp-40);
+  grid-template-columns: minmax(0, 1fr) var(--panel-w);
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "copy panel" "cta panel" "extras extras";
+}
+.frow.is-split.frow--panel-left {
+  grid-template-columns: var(--panel-w) minmax(0, 1fr);
+  grid-template-areas: "panel copy" "panel cta" "extras extras";
+}
+.frow.is-stack { grid-template-areas: "bar" "copy" "cta" "panel" "extras"; }
+
+.frow__bar { display: none; grid-area: bar; }
+.frow__copy { grid-area: copy; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.frow__chip { margin-bottom: var(--sp-24); line-height: 0; }
+.frow__body { margin-top: var(--sp-16); max-width: var(--measure-body); color: var(--text-soft); }
+.frow__cta { grid-area: cta; align-self: start; margin-top: var(--sp-32); }
+.frow__panel { grid-area: panel; align-self: start; min-width: 0; margin: 0; }
+.frow__extras { grid-area: extras; margin-top: var(--sp-40); }
+.is-stack .frow__panel { margin-top: var(--sp-40); }
+.is-stack .frow__extras { margin-top: var(--sp-32); }
+
+/* ---- the mosaic panel: 40px tiles in two ramp tints (SVG from verify.ts) under a card plate ------------------ */
+.frow__mosaic {
+  --t1: var(--ramp-5);
+  --t2: var(--ramp-4);
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: var(--panel-h, 400px);
+  background: var(--t1);
+}
+.is-split .frow__mosaic { width: var(--panel-w); }
+.frow__mosaic--violet { --t1: var(--ramp-5); --t2: var(--ramp-4); }
+.frow__mosaic--blue   { --t1: var(--ramp-3); --t2: var(--ramp-2); }
+.frow__mosaic--azure  { --t1: var(--ramp-1); --t2: var(--ramp-0); }
+.frow__tiles { position: absolute; inset: 0; overflow: hidden; line-height: 0; }
+.frow__svg { display: block; }
+.frow__t2 { fill: var(--t2); }
+.frow__mosaic > .dot { z-index: 2; }
+
+.frow__plate {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--card);
+  color: var(--text);
+}
+.frow__art {
+  display: grid;
+  place-items: center;
+  width: var(--aw, 384px);
+  height: var(--ah, 192px);
+  line-height: 0;
+}
+
+/* micro labels inside the plate (never on the sprite) */
+.frow__label {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: 16px;
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* row 1: the readout under the panel; its "1" pulses blue while the players are in their `win` state */
+.frow__readout { margin-top: var(--sp-12); color: var(--text-soft); }
+.frow__one.is-win { color: var(--blue); }
+
+/* row 2: PHYSICAL / CRYPTOGRAPHIC SEPARATION, both stacked in one cell so the swap never shifts layout */
+.frow__label--swap {
+  display: grid;
+  justify-items: center;
+  margin-top: 12px;
+}
+.frow__label--swap > span { grid-area: 1 / 1; visibility: hidden; }
+.frow__label--swap[data-state="physical"] .frow__phys,
+.frow__label--swap[data-state="crypto"] .frow__crypto { visibility: visible; }
+.frow__label--swap[data-state="crypto"] { color: var(--blue); }
+
+/* row 3: schedule label + verdict stamp above the sprite; provider label + ΔE under the meter below it */
+.frow__lrow {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-left: calc(2 * var(--u, 4px));                 /* the first tile starts 2 art px in */
+}
+.frow__lrow--top { margin-bottom: 8px; padding-right: calc(5 * var(--u, 4px)); }   /* stamp ends on the meter's edge */
+.frow__lrow--bot { margin-top: 8px; min-height: 16px; }
+.frow__meter {
+  position: absolute;
+  top: 0;
+  left: calc(119.5 * var(--u, 4px));
+  transform: translateX(-50%);
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 16px;
+}
+.frow__stamp { display: inline-grid; }
+.frow__stamp > span {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  padding: 0 6px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--fs-micro);
+  line-height: 14px;
+  letter-spacing: var(--ls-caps);
+  text-align: center;
+  white-space: nowrap;
+}
+.frow__stamp-ok { color: var(--ramp-5); }
+.frow__stamp-no { color: var(--alert); background: var(--alert-tint); }
+.frow__stamp[data-state="accepted"] .frow__stamp-ok,
+.frow__stamp[data-state="rejected"] .frow__stamp-no { visibility: visible; animation: s3-thunk 166ms steps(1, end); }
+@keyframes s3-thunk { 0% { transform: translateY(-4px); } 50% { transform: translateY(1px); } 100% { transform: none; } }
+:root[data-motion="reduced"] .frow__stamp > span { animation: none; }
+
+/* ---- extras strips (span the row under copy + panel) ------------------------------------------------------- */
+.frow__cap { color: var(--text-soft); }
+.frow__extras .cell { gap: var(--sp-12); padding: var(--sp-24); }
+
+/* row 1: stat pair + explainer + rigidity as one ledger strip */
+.frow__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.frow__stats .frow__note { grid-column: 1 / -1; }
+.frow__stat { justify-content: space-between; gap: var(--sp-24) !important; min-height: 176px; }
+.frow__stat .num-xl { color: var(--text); }
+.frow__stat.on-blue .frow__cap { color: var(--ramp-0); }
+.frow__note .eyebrow { margin-bottom: 0; }
+@container frow (min-width: 560px) {
+  .frow__stats .frow__note { grid-column: auto; }
+}
+@container frow (min-width: 860px) {
+  .frow__stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* row 2: two mini-cells with a hairline on top */
+.frow__minis { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-24); }
+.frow__mini { display: flex; flex-direction: column; gap: var(--sp-8); padding-top: var(--sp-16); border-top: 1px solid var(--line); }
+@container frow (min-width: 560px) {
+  .frow__minis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-40); }
+}
+
+/* row 3: Test round (violet, as the T tiles) · Compute round (blue, as the C tiles) · Verdict */
+.frow__cards { grid-template-columns: minmax(0, 1fr); }
+.frow__card.is-test .h5 { color: var(--ramp-5); }
+.frow__card.is-compute .h5 { color: var(--blue); }
+@container frow (min-width: 700px) {
+  .frow__cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ---- research list -------------------------------------------------------------------------------------------- */
+.research { padding-block: var(--seam); }
+.research__head { display: flex; flex-direction: column; gap: var(--sp-24); }
+.research__head .lead { max-width: var(--measure-lead); }
+.research__list { margin: var(--sp-40) 0 0; padding: 0; list-style: none; }
+.research__row { grid-template-columns: 96px minmax(0, 1fr) 200px 112px; }
+.research__row > .cell { gap: var(--sp-4); padding: var(--sp-24); }
+.research__year .num-l { color: var(--text); }
+.research__authors { color: var(--text); }
+.research__title { margin-top: var(--sp-4); }
+.research__gives { margin-top: var(--sp-4); color: var(--text-soft); }
+.research__venue .mono { color: var(--text-soft); }
+.research__link { flex-direction: row; align-items: flex-start; justify-content: space-between; text-decoration: none; }
+.research__glyph { display: inline-flex; line-height: 0; color: var(--text-soft); }
+.research__link:is(:hover, :focus-visible) .research__glyph { color: var(--text); animation: s3-out 166ms steps(1, end); }
+@keyframes s3-out { 0%, 99% { transform: translate(4px, -4px); } 100% { transform: none; } }
+:root[data-motion="reduced"] .research__glyph { animation: none !important; }
+
+/* ---- md (768–1023): the tab card becomes a sticky horizontal strip above the rows ----------------------------- */
+@media (max-width: 1023.98px) {
+  .v-grid { grid-template-columns: minmax(0, 1fr); }
+  .v-aside {
+    position: sticky;
+    top: var(--nav-total);
+    z-index: 3;
+    padding: var(--sp-12) 0;
+    background: var(--surface);
+  }
+  .v-tabs { position: static; flex-direction: row; }
+  .v-tabs .tabcard__item { flex: 1 1 0; min-width: 0; justify-content: center; background: var(--paper); text-align: center; }
+  .v-tabs .tabcard__item[aria-current="true"] { background: var(--card); }
+  .v-tabs .tabcard__item + .tabcard__item { border-top: 0; border-left: 1px solid var(--line); }
+  .v-tabs .tabcard__arrow { display: none; }
+  .frow { min-height: 0; }
+  .research__row {
+    grid-template-columns: 112px minmax(0, 1fr) 112px;
+    grid-template-areas: "year main link" "year venue link";
+  }
+  .research__year { grid-area: year; }
+  .research__main { grid-area: main; }
+  .research__venue { grid-area: venue; }
+  .research__link { grid-area: link; }
+  .research__row > .cell { padding: var(--sp-16); }
+}
+
+/* ---- sm (<768): each row gets its own header bar; panels bleed to the row's lines --------------------------- */
+@media (max-width: 767.98px) {
+  .v-aside { display: none; }
+  .frow__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+    margin: calc(-1 * var(--cell-pad)) calc(-1 * var(--cell-pad)) var(--sp-24);
+    padding: var(--sp-12) var(--cell-pad);
+    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--text);
+  }
+  .frow__num { color: var(--text-muted); }
+  .frow__panel { margin-inline: calc(-1 * var(--cell-pad)); }
+  .frow__readout { padding-inline: var(--cell-pad); }
+  .frow__extras .cell { padding: var(--sp-16); }
+  .research__row {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "year venue" "main main" "link link";
+  }
+  .research__year { padding-block: var(--sp-12) !important; }
+  .research__venue { justify-content: center; padding-block: var(--sp-12) !important; }
+  .research__link { align-items: center; min-height: 56px; }
+  .research__row + .research__row { margin-top: var(--sp-16); border-top: 1px solid var(--line); }
+}

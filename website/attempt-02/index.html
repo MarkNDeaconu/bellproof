@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en" data-motion="full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- meta: verbatim from src/content/meta.ts (content §1); keep the two in sync -->
+  <!-- LC2 (revision-1 §1.1.5): runs before first paint. html.js = JS is on; html.intro = the hero may play its
+       intro (CSS hides intro elements ONLY under html.intro, so with no JS, a hidden tab, reduced motion or the
+       user's pause switch the final hero is simply visible). data-motion mirrors engine motion.init(). -->
+  <script>(function(d,w){var h=d.documentElement,p=false,r=false;try{p=localStorage.getItem('bp-motion')==='paused'}catch(e){}try{r=w.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}h.classList.add('js');if(p)h.classList.add('is-motion-paused');h.setAttribute('data-motion',p||r?'reduced':'full');if(!d.hidden&&!p&&!r)h.classList.add('intro')})(document,window)</script>
+  <!-- LC2 critical CSS (< 1 KB): paint the canvas and the nav box before the stylesheet arrives (dev and slow
+       networks); without JS, revealed blocks are visible and the menu button (which needs JS) is hidden. -->
+  <style>
+    html{background:#FBFAF7;color:#0E1424}
+    body{margin:0;background:#FBFAF7}
+    .nav{position:sticky;top:0;z-index:100;height:48px;background:#FBFAF7;border-bottom:1px solid #DEDBD3}
+    html:not(.js) [data-reveal]{clip-path:none!important;transform:none!important}
+    html:not(.js) .nav__toggle,html:not(.js) .nav__panel{display:none!important}
+  </style>
+  <title>Bellproof · Verified quantum computation, settled on-chain</title>
+  <meta name="description" content="Bellproof verifies quantum cloud results with compiled nonlocal games. Providers get paid only when an answer passes, and anyone can audit the certificate." />
+  <meta name="theme-color" content="#0E1424" />
+  <meta name="author" content="Mark Deaconu" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Bellproof" />
+  <meta property="og:title" content="Bellproof" />
+  <meta property="og:description" content="Delegate quantum work. Verify every answer." />
+  <meta property="og:image" content="https://markndeaconu.github.io/bellproof/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="The Bellproof wordmark beside a pixel-art bell with a check mark, the line “Verified quantum computation, settled on-chain.” and stepped blue bands along the bottom." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <!-- Fonts (revision 1 · LC1): self-hosted in public/fonts (OFL, full woff2); @font-face + metric-matched
+       fallbacks in src/styles/base.css. Preload the two faces above the fold: Grotesk 500 (H1) and Mono 400 (ticker). -->
+  <link rel="preload" href="/fonts/SpaceGrotesk-500.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/JetBrainsMono-400.woff2" as="font" type="font/woff2" crossorigin />
+  <!-- integrator (queue #12): without JavaScript the first-paint hero copy stays visible and reveals are not clipped -->
+  <noscript><style>.hero-shell__text,.hero-shell__fridge{visibility:visible!important}[data-reveal]{clip-path:none!important;transform:none!important}.hero-shell .rail,.hero-shell .arc{opacity:1!important}.hero-shell__fridge .px{display:none}.footer__bell{left:calc(max(var(--gutter),(100% - var(--content-max))/2) + 72px)}</style></noscript>
+</head>
+<body>
+  <!-- layout-core owns this file: structure only. Every visible string comes from src/content/strings.ts
+       via data-str (fillStrings re-applies it at boot; the static text is a first-paint copy, checked
+       against strings.ts by qa/layout-core/check-static-strings.ts).
+       Section contract (README-layout.md): layout-core owns each <section> element (id, class, data-tint,
+       seam); the section agent owns everything inside it and replaces the skeleton shell. -->
+  <a class="skip" href="#main" data-str="ui.skipLink">Skip to content</a>
+
+  <header class="nav" id="nav">
+    <div class="nav__bar">
+      <a class="nav__cell nav__logo" href="#top" data-str-href="nav.logo.href">
+        <span class="nav__mark"><svg data-icon="logo-mark" data-size="2" xmlns="http://www.w3.org/2000/svg" class="mark mark--nav" width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges" fill="currentColor" overflow="visible" style="overflow:visible" data-mark="bell" data-scale="2" aria-hidden="true"><g class="mark__halo" fill="#8FAEFF" data-halo></g><g class="mark__body" data-body><rect x="5" y="0" width="2" height="1"/><rect x="4" y="1" width="4" height="1"/><rect x="3" y="2" width="6" height="1"/><rect x="3" y="3" width="6" height="1"/><rect x="3" y="4" width="6" height="1"/><rect x="2" y="5" width="6" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="2" y="6" width="5" height="1"/><rect x="8" y="6" width="2" height="1"/><rect x="2" y="7" width="2" height="1"/><rect x="5" y="7" width="1" height="1"/><rect x="7" y="7" width="3" height="1"/><rect x="2" y="8" width="3" height="1"/><rect x="6" y="8" width="4" height="1"/><rect x="0" y="9" width="12" height="1"/></g><g class="mark__clapper" data-clapper><rect x="5" y="10" width="2" height="1"/></g></svg></span>
+        <span class="nav__wordmark" data-str="nav.logo.label">Bellproof</span>
+      </a>
+      <nav class="nav__primary" aria-label="Main">
+        <ul class="nav__items" role="list">
+          <li><a class="nav__cell nav__link" href="#flip" data-spy="flip" data-str="nav.items.0.label" data-str-href="nav.items.0.href">Why verify</a></li>
+          <li><a class="nav__cell nav__link" href="#verify" data-spy="verify" data-str="nav.items.1.label" data-str-href="nav.items.1.href">How it works</a></li>
+          <li><a class="nav__cell nav__link" href="#flow" data-spy="flow" data-str="nav.items.2.label" data-str-href="nav.items.2.href">Contracts</a></li>
+          <li><a class="nav__cell nav__link" href="#clients" data-spy="clients" data-str="nav.items.3.label" data-str-href="nav.items.3.href">Who it’s for</a></li>
+          <li><a class="nav__cell nav__link" href="#research" data-spy="research" data-str="nav.items.4.label" data-str-href="nav.items.4.href">Research</a></li>
+        </ul>
+      </nav>
+      <span class="nav__spacer" aria-hidden="true"></span>
+      <button class="nav__cell nav__pause" type="button" aria-pressed="false" data-motion-toggle>
+        <span class="nav__pause-icon"><svg data-icon="ui-pause" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="0" y="0" width="2" height="1"/><rect x="3" y="0" width="2" height="1"/><rect x="0" y="1" width="2" height="1"/><rect x="3" y="1" width="2" height="1"/><rect x="0" y="2" width="2" height="1"/><rect x="3" y="2" width="2" height="1"/><rect x="0" y="3" width="2" height="1"/><rect x="3" y="3" width="2" height="1"/><rect x="0" y="4" width="2" height="1"/><rect x="3" y="4" width="2" height="1"/></svg></span><span class="nav__pause-label" data-str="nav.pauseMotion">Pause motion</span>
+      </button>
+      <a class="nav__cell nav__contact" href="mailto:[Contact email]" data-str-href="nav.contact.href"><span data-str="nav.contact.label">Contact</span></a>
+      <a class="nav__cell nav__demo" data-hop="press" href="[Demo link]" data-str-href="nav.demo.href"><svg data-icon="ui-play" xmlns="http://www.w3.org/2000/svg" class="icon" width="32" height="32" viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="1" y="0" width="1" height="1"/><rect x="1" y="1" width="3" height="1"/><rect x="1" y="2" width="5" height="1"/><rect x="1" y="3" width="7" height="1"/><rect x="1" y="4" width="7" height="1"/><rect x="1" y="5" width="5" height="1"/><rect x="1" y="6" width="3" height="1"/><rect x="1" y="7" width="1" height="1"/></svg><span data-str="nav.demo.label">Watch the demo</span></a>
+      <button class="nav__cell nav__toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu" data-str-aria="ui.menuOpen">
+        <span class="nav__toggle-icon"><svg data-icon="ui-menu" xmlns="http://www.w3.org/2000/svg" class="icon" width="28" height="28" viewBox="0 0 7 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="0" y="0" width="1" height="1"/><rect x="3" y="0" width="1" height="1"/><rect x="6" y="0" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/></svg></span>
+      </button>
+    </div>
+    <nav class="nav__panel" id="nav-menu" aria-label="Main">
+      <div class="nav__ctas">
+        <a class="btn btn--primary" data-hop="press" href="[Demo link]" data-str-href="nav.demo.href"><span class="btn__icon btn__icon--lead"><svg data-icon="ui-play-sm" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="1" y="0" width="2" height="1"/><rect x="1" y="1" width="3" height="1"/><rect x="1" y="2" width="4" height="1"/><rect x="1" y="3" width="3" height="1"/><rect x="1" y="4" width="2" height="1"/></svg></span><span class="btn__label" data-str="nav.demo.label">Watch the demo</span></a>
+        <a class="btn btn--outline" href="mailto:[Contact email]" data-str-href="nav.contact.href"><span class="btn__label" data-str="nav.contact.label">Contact</span></a>
+      </div>
+      <ol class="nav__rows" role="list">
+        <li><a class="nav__row" href="#flip" data-spy="flip" data-str-href="nav.items.0.href"><span class="nav__row-n">01</span><span class="nav__row-label" data-str="nav.items.0.label">Why verify</span></a></li>
+        <li><a class="nav__row" href="#verify" data-spy="verify" data-str-href="nav.items.1.href"><span class="nav__row-n">02</span><span class="nav__row-label" data-str="nav.items.1.label">How it works</span></a></li>
+        <li><a class="nav__row" href="#flow" data-spy="flow" data-str-href="nav.items.2.href"><span class="nav__row-n">03</span><span class="nav__row-label" data-str="nav.items.2.label">Contracts</span></a></li>
+        <li><a class="nav__row" href="#clients" data-spy="clients" data-str-href="nav.items.3.href"><span class="nav__row-n">04</span><span class="nav__row-label" data-str="nav.items.3.label">Who it’s for</span></a></li>
+        <li><a class="nav__row" href="#research" data-spy="research" data-str-href="nav.items.4.href"><span class="nav__row-n">05</span><span class="nav__row-label" data-str="nav.items.4.label">Research</span></a></li>
+      </ol>
+      <button class="nav__row nav__row--pause" type="button" aria-pressed="false" data-motion-toggle>
+        <span class="nav__pause-icon"><svg data-icon="ui-pause" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="0" y="0" width="2" height="1"/><rect x="3" y="0" width="2" height="1"/><rect x="0" y="1" width="2" height="1"/><rect x="3" y="1" width="2" height="1"/><rect x="0" y="2" width="2" height="1"/><rect x="3" y="2" width="2" height="1"/><rect x="0" y="3" width="2" height="1"/><rect x="3" y="3" width="2" height="1"/><rect x="0" y="4" width="2" height="1"/><rect x="3" y="4" width="2" height="1"/></svg></span><span class="nav__row-label" data-str="nav.pauseMotion">Pause motion</span>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- 1 · Hero · sections-1 (top.ts) -->
+    <section id="top" class="sec sec--top" data-tint="card">
+      <div class="hero-shell">
+        <div class="rail rail--left"></div>
+        <div class="hero-shell__main">
+          <div class="hero-shell__text">
+            <a class="pill" data-hop="step" href="#flow" data-str-href="top.pill.href"><span class="pill__tile"><span class="px" data-piece="tc-glyph" data-variant="sm" data-decorative></span></span><span class="pill__label" data-str="top.pill.label">One job, two providers: see who gets paid</span><span class="pill__label pill__label--short" data-str="top.pill.labelShort">See who gets paid</span><span class="btn__icon"><svg data-icon="ui-chevron" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="1" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/></svg></span></a>
+            <h1 class="display" data-str="top.h1">Verified quantum computation, settled on-chain.</h1>
+            <p class="lead" data-str="top.lead">A verification layer between the people who need quantum answers and the clouds that compute them. Providers get paid only when the answer checks out.</p>
+            <div class="btn-row">
+              <a data-hop="step" class="btn btn--primary" href="#verify" data-str-href="top.ctas.primary.href"><span class="btn__label" data-str="top.ctas.primary.label">See how it works</span><span class="btn__icon"><svg data-icon="ui-chevron" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="1" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/></svg></span></a>
+              <a data-hop="out" class="btn btn--outline" href="[Demo link]" data-str-href="top.ctas.secondary.href"><span class="btn__label" data-str="top.ctas.secondary.label">Watch the demo</span><span class="btn__icon"><svg data-icon="ui-external-sm" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="2" y="0" width="3" height="1"/><rect x="3" y="1" width="2" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/></svg></span></a>
+            </div>
+            <p class="mono t-soft hero-shell__ticker"><span data-str="top.ticker">job #0412 · ΔE = −12.4 ± 1.0 kcal/mol · test rounds passed · ACCEPTED</span><span class="tag-illustrative" data-str="common.illustrative">illustrative</span></p>
+          </div>
+          <div class="hero-shell__fridge"><span class="px" data-piece="placeholder" data-decorative></span></div>
+        </div>
+        <div class="rail rail--right"></div>
+      </div>
+      <div class="cells cells--flush strip">
+        <div class="cell cell--paper strip__label"><p class="h5" data-str="top.strip.label">Built on published research</p></div>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/1804.01082" data-str-href="top.strip.cells.0.href"><span class="mono" data-str="top.strip.cells.0.name">Mahadev</span><span class="micro t-muted" data-str="top.strip.cells.0.venue">FOCS 2018</span><span class="strip__glyph"><svg data-icon="ui-external" xmlns="http://www.w3.org/2000/svg" class="icon" width="28" height="28" viewBox="0 0 7 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="3" y="0" width="4" height="1"/><rect x="5" y="1" width="2" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="0" y="6" width="5" height="1"/></svg></span></a>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/2203.15877" data-str-href="top.strip.cells.1.href"><span class="mono" data-str="top.strip.cells.1.name">KLVY</span><span class="micro t-muted" data-str="top.strip.cells.1.venue">STOC 2023</span><span class="strip__glyph"><svg data-icon="ui-external" xmlns="http://www.w3.org/2000/svg" class="icon" width="28" height="28" viewBox="0 0 7 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="3" y="0" width="4" height="1"/><rect x="5" y="1" width="2" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="0" y="6" width="5" height="1"/></svg></span></a>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/2303.01545" data-str-href="top.strip.cells.2.href"><span class="mono" data-str="top.strip.cells.2.name">Natarajan–Zhang</span><span class="micro t-muted" data-str="top.strip.cells.2.venue">FOCS 2023</span><span class="strip__glyph"><svg data-icon="ui-external" xmlns="http://www.w3.org/2000/svg" class="icon" width="28" height="28" viewBox="0 0 7 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="3" y="0" width="4" height="1"/><rect x="5" y="1" width="2" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="0" y="6" width="5" height="1"/></svg></span></a>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/2609.38060" data-str-href="top.strip.cells.3.href"><span class="mono" data-str="top.strip.cells.3.name">Holler–Natarajan</span><span class="micro t-muted" data-str="top.strip.cells.3.venue">arXiv 2026</span><span class="strip__glyph"><svg data-icon="ui-external" xmlns="http://www.w3.org/2000/svg" class="icon" width="28" height="28" viewBox="0 0 7 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="3" y="0" width="4" height="1"/><rect x="5" y="1" width="2" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="0" y="6" width="5" height="1"/></svg></span></a>
+        <a class="cell cell--link strip__cite" data-hop="out" href="https://arxiv.org/abs/2604.23516" data-str-href="top.strip.cells.4.href"><span class="mono" data-str="top.strip.cells.4.name">Mohammed–Abadi–Mahdi</span><span class="micro t-muted" data-str="top.strip.cells.4.venue">CCS 2026</span><span class="strip__glyph"><svg data-icon="ui-external" xmlns="http://www.w3.org/2000/svg" class="icon" width="28" height="28" viewBox="0 0 7 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="3" y="0" width="4" height="1"/><rect x="5" y="1" width="2" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="0" y="6" width="5" height="1"/></svg></span></a>
+      </div>
+    </section>
+
+    <!-- 2 · Trust · sections-1 (trust.ts) -->
+    <section id="trust" class="sec sec--trust" data-tint="paper">
+      <div class="wrap shell">
+        <header class="shell__head shell__head--center">
+          <p class="eyebrow" data-reveal="1" data-str="trust.eyebrow">01 · Delegated compute</p>
+          <h2 class="h2" data-reveal="2" data-str="trust.h2">We trust the cloud because we can check it.</h2>
+          <p class="lead" data-reveal="3" data-str="trust.lead">We already rent storage, GPUs and whole pipelines. It feels safe because checking an answer costs far less than computing it.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 3 · Flip + paradox band · sections-1 (flip.ts) -->
+    <section id="flip" class="sec sec--flip" data-tint="card">
+      <div class="wrap shell">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="flip.eyebrow">02 · Quantum in the cloud</p>
+          <h2 class="h2" data-reveal="2" data-str="flip.h2">Quantum hands back one number. Good luck checking it.</h2>
+          <p class="lead" data-reveal="3" data-str="flip.lead">IBM Quantum, Amazon Braket and Azure Quantum already rent time on real quantum processors. Most organizations will rent, the way they rent GPUs today. What comes back is one classical number, with a quantum state behind it that only a quantum computer can hold.</p>
+        </header>
+        <div class="cells"><div class="cell cell--paper shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+      <div id="paradox" class="band grid-colour" data-tint="blue">
+        <div class="wrap shell shell--band">
+          <header class="shell__head">
+            <p class="eyebrow" data-reveal="1" data-str="flip.paradox.eyebrow">The verification paradox</p>
+            <p class="display shell__statement" data-reveal="2" data-str="flip.paradox.statement">If you could check the answer classically, you wouldn’t need the quantum computer.</p>
+            <p class="lead" data-reveal="3" data-str="flip.paradox.sub">That gap is what Bellproof closes.</p>
+          </header>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · Cost · sections-1 (cost.ts) -->
+    <section id="cost" class="sec sec--cost" data-tint="card">
+      <div class="wrap shell">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="cost.eyebrow">03 · The cost of a wrong answer</p>
+          <h2 class="h2" data-reveal="2" data-str="cost.h2">A wrong answer looks exactly like a right one.</h2>
+          <p class="lead" data-reveal="3" data-str="cost.lead">None of these raises an error. Every one returns a plausible number.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 5 · Layer · sections-2 (layer.ts) -->
+    <section id="layer" class="sec sec--layer" data-tint="paper">
+      <div class="wrap shell">
+        <header class="shell__head shell__head--center">
+          <p class="eyebrow" data-reveal="1" data-str="layer.eyebrow">04 · The verification layer</p>
+          <h2 class="h2" data-reveal="2" data-str="layer.h2">Bellproof checks the answer before anyone gets paid.</h2>
+          <p class="lead" data-reveal="3" data-str="layer.lead">A verification layer between clients and quantum clouds, settled by smart contracts. Clients need no quantum hardware. Providers need no brand trust.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 6 · Clients · sections-2 (clients.ts) -->
+    <section id="clients" class="sec sec--clients" data-tint="card">
+      <div class="wrap shell">
+        <!-- integrator R2: no right-hand button in the shell either (revision 1 §1.5; it showed with JavaScript off) -->
+        <header class="shell__head shell__head--row">
+          <div>
+            <p class="eyebrow" data-reveal="1" data-str="clients.eyebrow">05 · Who it’s for</p>
+            <h2 class="h2 measure-h2" data-reveal="2" data-str="clients.h2">Built for decisions that ride on one number.</h2>
+            <p class="lead measure-lead shell__lead" data-reveal="3" data-str="clients.lead">If you have a decision gated on one number, expensive steps downstream, and no quantum computer in-house, Bellproof is for you.</p>
+          </div>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 7 · Flow · sections-2 (flow.ts) -->
+    <section id="flow" class="sec sec--flow" data-tint="paper">
+      <div class="wrap shell">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="flow.eyebrow">06 · Smart contracts</p>
+          <h2 class="h2" data-reveal="2" data-str="flow.h2">Seven steps. The money moves last.</h2>
+          <p class="lead" data-reveal="3" data-str="flow.lead">Money, commitments and verdicts live on-chain. Quantum work and heavy math stay off-chain. Anyone can audit the trail.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 8 · Verify + research list · sections-3 (verify.ts). Keep id="research" (the nav links to it). -->
+    <section id="verify" class="sec sec--verify" data-tint="card">
+      <div class="wrap shell">
+        <header class="shell__head shell__head--center">
+          <p class="eyebrow" data-reveal="1" data-str="verify.eyebrow">07 · How we verify</p>
+          <h2 class="h2" data-reveal="2" data-str="verify.h2">A game only quantum players can win.</h2>
+          <p class="lead" data-reveal="3" data-str="verify.lead">We check quantum work with nonlocal games, compiled with encryption, hidden among the real computation. Three ideas, one verdict.</p>
+        </header>
+        <!-- integrator R2: a plain stage cell like the other shells; attempt-01's violet mosaic (originality #5) showed with JavaScript off -->
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+        <div id="research" class="shell__sub">
+          <h3 class="h3" data-reveal="1" data-str="verify.research.h3">The papers behind it.</h3>
+          <p class="lead measure-lead" data-reveal="2" data-str="verify.research.lead">Bellproof builds on published results in classical verification of quantum computation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · Guarantees · sections-3 (guarantees.ts) -->
+    <section id="guarantees" class="sec sec--guarantees" data-tint="paper">
+      <div class="wrap shell">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="guarantees.eyebrow">08 · The certificate</p>
+          <h2 class="h2" data-reveal="2" data-str="guarantees.h2">What the certificate promises, and where it stops.</h2>
+          <p class="lead" data-reveal="3" data-str="guarantees.lead">Every passing job mints a certificate. It travels with the result, so anyone downstream can check it.</p>
+        </header>
+        <div class="cells"><div class="cell shell__stage"><span class="px" data-piece="placeholder" data-decorative></span></div></div>
+      </div>
+    </section>
+
+    <!-- 10 · CTA band · sections-3 (cta.ts) -->
+    <section id="cta" class="sec sec--cta grid-colour" data-tint="ink">
+      <div class="wrap shell shell--cta">
+        <header class="shell__head">
+          <p class="eyebrow" data-reveal="1" data-str="cta.eyebrow">Bellproof</p>
+          <h2 class="display" data-reveal="2" data-str="cta.h2">Delegate quantum work. Verify every answer.</h2>
+          <p class="lead" data-reveal="3" data-str="cta.lead">One job, two providers. Watch the honest one get paid and the cheater get slashed.</p>
+        </header>
+        <div class="cells cells--3">
+          <a class="cell cell--link shell__cta-cell" data-hop="out" href="[Demo link]" data-str-href="cta.cells.0.href">
+            <span class="px" data-piece="placeholder" data-decorative></span>
+            <span class="shell__cta-copy"><span class="h4" data-str="cta.cells.0.title">Watch the demo</span><span class="cell__body" data-str="cta.cells.0.body">One job, two providers, one verdict each.</span></span>
+            <span class="shell__cta-glyph"><svg data-icon="ui-external" xmlns="http://www.w3.org/2000/svg" class="icon" width="28" height="28" viewBox="0 0 7 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="3" y="0" width="4" height="1"/><rect x="5" y="1" width="2" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="0" y="6" width="5" height="1"/></svg></span>
+          </a>
+          <a class="cell cell--link shell__cta-cell" data-hop="out" href="[GitHub]" data-str-href="cta.cells.1.href">
+            <span class="px" data-piece="placeholder" data-decorative></span>
+            <span class="shell__cta-copy"><span class="h4" data-str="cta.cells.1.title">Read the code</span><span class="cell__body" data-str="cta.cells.1.body">Contracts, verifier and demo, in the open.</span></span>
+            <span class="shell__cta-glyph"><svg data-icon="ui-external" xmlns="http://www.w3.org/2000/svg" class="icon" width="28" height="28" viewBox="0 0 7 7" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="3" y="0" width="4" height="1"/><rect x="5" y="1" width="2" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="0" y="6" width="5" height="1"/></svg></span>
+          </a>
+          <a class="cell cell--link shell__cta-cell" data-hop="step" href="#research" data-str-href="cta.cells.2.href">
+            <span class="px" data-piece="placeholder" data-decorative></span>
+            <span class="shell__cta-copy"><span class="h4" data-str="cta.cells.2.title">Read the research</span><span class="cell__body" data-str="cta.cells.2.body">Five papers, from Mahadev 2018 to CCS 2026.</span></span>
+            <span class="shell__cta-glyph"><svg data-icon="ui-chevron" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="1" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/></svg></span>
+          </a>
+        </div>
+        <div class="shell__cta-final">
+          <a data-hop="step" class="btn btn--primary-on-dark" href="mailto:[Contact email]" data-str-href="cta.contact.href"><span class="btn__label" data-str="cta.contact.label">Contact</span><span class="btn__icon"><svg data-icon="ui-chevron" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="1" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/></svg></span></a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 11 · Footer · layout-core (revision-1 §1.8): columns, a one-row sub-footer, then the stage: the bell hangs
+       from the sub-footer's bottom hairline on its cable and is lowered in on scroll, the bands' stepped strata, and
+       Alice and Bob arriving on the strata's edge to stand either side of the bell (it rings when they arrive). -->
+  <footer id="footer" class="footer" data-tint="card">
+    <nav class="cells cells--flush footer__cols" aria-label="Footer" data-footer-cols></nav>
+    <!-- integrator R2 (user request): the founder credit, one row above the sub-footer (filled from strings.footer.credit) -->
+    <div class="footer__credit">
+      <p class="small footer__credit-text"><span data-str="footer.credit.lead">Built by</span> <strong data-str="footer.credit.name">Mark Deaconu</strong><span data-str="footer.credit.rest">, a computer science PhD student at EPFL working on the foundations of quantum computation and complexity theory.</span></p>
+      <ul class="footer__credit-links" role="list" aria-label="Mark Deaconu online"><li><a class="footer__credit-link mono" data-hop="out" href="https://markdeaconu.com" data-str-href="footer.credit.links.0.href"><span data-str="footer.credit.links.0.label">markdeaconu.com</span><svg data-icon="ui-external-sm" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="2" y="0" width="3" height="1"/><rect x="3" y="1" width="2" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/></svg></a></li><li><a class="footer__credit-link mono" data-hop="out" href="https://scholar.google.com/citations?user=_IgP79MAAAAJ" data-str-href="footer.credit.links.1.href"><span data-str="footer.credit.links.1.label">Google Scholar</span><svg data-icon="ui-external-sm" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="2" y="0" width="3" height="1"/><rect x="3" y="1" width="2" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/></svg></a></li><li><a class="footer__credit-link mono" data-hop="out" href="https://github.com/MarkNDeaconu" data-str-href="footer.credit.links.2.href"><span data-str="footer.credit.links.2.label">GitHub</span><svg data-icon="ui-external-sm" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="2" y="0" width="3" height="1"/><rect x="3" y="1" width="2" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/></svg></a></li><li><a class="footer__credit-link mono" data-hop="out" href="https://arxiv.org/search/?searchtype=author&amp;query=Deaconu%2C+Mark" data-str-href="footer.credit.links.3.href"><span data-str="footer.credit.links.3.label">arXiv</span><svg data-icon="ui-external-sm" xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 5 5" shape-rendering="crispEdges" fill="currentColor" aria-hidden="true"><rect x="2" y="0" width="3" height="1"/><rect x="3" y="1" width="2" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/></svg></a></li></ul>
+    </div>
+    <div class="footer__sub">
+      <ul class="footer__socials" role="list" data-footer-socials></ul>
+      <p class="h6 footer__tagline" data-str="footer.tagline">Verified quantum computation, settled on-chain.</p>
+      <p class="small footer__meta"><span data-str="footer.copyright">Bellproof © 2026</span></p>
+    </div>
+    <div class="footer__stage" aria-hidden="true">
+      <div class="footer__bell"><span class="footer__cable"></span><div class="footer__bell-mark"><svg data-icon="logo-mark" data-size="20" xmlns="http://www.w3.org/2000/svg" class="mark mark--footer" width="240" height="220" viewBox="0 0 12 11" shape-rendering="crispEdges" fill="currentColor" overflow="visible" style="overflow:visible" data-mark="bell" data-scale="20" aria-hidden="true"><g class="mark__halo" fill="#8FAEFF" data-halo></g><g class="mark__body" data-body><rect x="5" y="0" width="2" height="1"/><rect x="4" y="1" width="4" height="1"/><rect x="3" y="2" width="6" height="1"/><rect x="3" y="3" width="6" height="1"/><rect x="3" y="4" width="6" height="1"/><rect x="2" y="5" width="6" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="2" y="6" width="5" height="1"/><rect x="8" y="6" width="2" height="1"/><rect x="2" y="7" width="2" height="1"/><rect x="5" y="7" width="1" height="1"/><rect x="7" y="7" width="3" height="1"/><rect x="2" y="8" width="3" height="1"/><rect x="6" y="8" width="4" height="1"/><rect x="0" y="9" width="12" height="1"/></g><g class="mark__clapper" data-clapper><rect x="5" y="10" width="2" height="1"/></g></svg></div></div>
+      <div class="footer__strata"></div>
+      <div class="footer__walkers"></div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

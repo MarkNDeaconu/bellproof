@@ -1,0 +1,134 @@
+/* Section 6 · #clients (design-spec §5.6, §4.6). Owner: sections-2. Unlayered: beats the shared layers.
+   Header row (eyebrow + h2 | outline button, bottom-aligned; lead below) → the tabs grid, whose top
+   edge is the hairline under the row. lg: [340 tab list] [panel: blue question cell / stakes cell].
+   md/sm: an accordion; the open item holds the same two cells. */
+
+.clients {
+  padding-block: var(--sec-pad-top) var(--seam);
+}
+
+/* ---- header row ------------------------------------------------------------------------------ */
+.clients__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-24);
+  padding-bottom: var(--seam);
+}
+.clients__intro .h2 { max-width: var(--measure-h2); margin-top: var(--sp-16); }
+.clients__lead { max-width: var(--measure-lead); }
+.clients__cta { justify-self: start; }
+@media (min-width: 1024px) {
+  .clients__head { grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--sp-40); }
+  .clients__intro { grid-column: 1; grid-row: 1; }
+  .clients__cta { grid-column: 2; grid-row: 1; align-self: end; }
+  .clients__lead { grid-column: 1; grid-row: 2; }
+}
+
+/* ---- the question cell (shared by tabs and accordion) ------------------------------------------ */
+.clients__q {
+  position: relative;
+  min-height: 320px;
+  padding: var(--sp-40);
+  background: var(--ramp-3);
+  color: var(--on-dark);
+}
+.clients__q-text { padding-right: calc(192px + var(--sp-40)); }
+.clients__question {
+  margin-top: var(--sp-16);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 44px;                       /* h3 on colour: 44/48 at lg (design §2.1) */
+  line-height: 48px;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  max-width: 16em;
+}
+.clients__sprite {
+  position: absolute;
+  right: var(--sp-40);
+  bottom: var(--sp-40);
+  width: 192px;
+  height: 192px;
+  line-height: 0;
+}
+.clients__sprite > .px { display: block; }
+.clients__sprite > .clients__over { position: absolute; inset: 0; }   /* the incoming sprite, during the dissolve */
+
+/* stakes and certificate: two columns */
+.clients__detail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-40);
+  padding: var(--sp-40);
+  background: var(--card);
+}
+.clients__col { display: flex; flex-direction: column; gap: var(--sp-16); min-width: 0; }
+.clients__col-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-8) var(--sp-16); min-height: 24px; }
+.clients__cert { color: var(--text-soft); max-width: 36ch; }
+.chip-example.is-hidden { visibility: hidden; }
+
+/* the 150-ms copy swap */
+[data-swap] { transition: opacity var(--dur-ui) var(--ease-ui); }
+[data-swap].is-out { opacity: 0; }
+
+/* ---- lg: tab list + panel in one hairline grid ------------------------------------------------- */
+.clients__tabs {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+}
+.clients__list { border: 0; align-self: stretch; }
+.clients__list .vtab { flex: 1 0 auto; }
+.vtab__icon { display: block; line-height: 0; }
+.vtab__icon .icon { display: block; }
+.vtab[aria-selected="true"] .vtab__icon { color: var(--blue); }
+.clients__panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 1px;
+  background: var(--hairline);
+  min-width: 0;
+}
+.clients__panel:focus-visible { outline-offset: -4px; }
+
+.clients__acc { display: none; }
+
+@media (max-width: 1023.98px) {
+  .clients__tabs { display: none; }
+  .clients__acc { display: block; border-top: 1px solid var(--hairline); overflow-anchor: none; }   /* clients.ts pins the header */
+  .clients__acc-h { margin: 0; }
+  /* the header button sits in an <h3>, so the shared `head + panel` rule can't see it: open by item */
+  .clients__acc .acc__item.is-open > .acc__panel {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: grid-template-rows var(--dur-panel) var(--ease-ui);
+  }
+  .clients__lead { order: 1; }
+  .clients__cta { order: 2; }
+  .clients__acc .acc__head { min-height: 64px; padding-block: var(--sp-16); }
+  .clients__acc-label { display: inline-flex; align-items: center; gap: var(--sp-16); }
+  .clients__acc-label .vtab__icon { color: var(--text-muted); }
+  .clients__acc .acc__head[aria-expanded="true"] .vtab__icon { color: var(--blue); }
+  .clients__acc-glyph { display: inline-flex; flex: none; line-height: 0; }
+  .clients__acc-body {
+    display: grid;
+    gap: 1px;
+    margin-bottom: var(--sp-24);
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+  }
+  .clients__q { min-height: 0; padding: var(--sp-24); }
+  .clients__q-text { padding-right: calc(192px + var(--sp-24)); min-height: 192px; }
+  .clients__question { font-size: var(--fs-h3); line-height: var(--lh-h3); }
+  .clients__sprite { right: var(--sp-24); bottom: var(--sp-24); }
+  .clients__detail { padding: var(--sp-24); gap: var(--sp-24); }
+}
+
+@media (max-width: 767.98px) {
+  .clients__q { padding: var(--sp-16); }
+  .clients__q-text { padding-right: 0; min-height: 0; }
+  .clients__sprite { position: relative; right: auto; bottom: auto; display: block; margin: var(--sp-24) 0 0 auto; }
+  .clients__detail { grid-template-columns: minmax(0, 1fr); padding: var(--sp-16); }
+}

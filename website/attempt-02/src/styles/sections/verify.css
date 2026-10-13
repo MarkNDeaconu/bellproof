@@ -1,0 +1,287 @@
+/* Section 8 · How we verify · #verify (design-spec §5.8, revision-1 §1.4). Owner: sections-3.
+   head · figure bar (numbered tabs) · rows (copy | figure frame) · #research ledger.
+   Row mode (.is-split / .is-stack), --panel-w, --panel-pad and the sprite unit --u are measured in verify.ts. */
+
+/* ---- shared sections-3 text link: label underlined, trailing glyph takes the 2-tick pixel step ---------------- */
+.s3-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-8);
+  padding-right: 4px;                       /* room for the stepped glyph inside the focus ring (a11y #17) */
+  color: var(--text);
+}
+.s3-link__label {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: currentColor;
+  transition: text-decoration-color var(--dur-ui) var(--ease-ui);
+}
+.s3-link:hover .s3-link__label { text-decoration-color: var(--blue); }
+.on-dark .s3-link:hover .s3-link__label { text-decoration-color: var(--on-dark-accent); }
+.s3-link__icon { display: inline-flex; line-height: 0; transition: transform var(--dur-step) steps(2, jump-start); }
+.s3-link:is(:hover, :focus-visible) .s3-link__icon { transform: translateX(4px); }
+:root[data-motion="reduced"] .s3-link__icon { transition: none; }
+
+/* ---- head ------------------------------------------------------------------------------------------------------ */
+#verify .v-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-block: var(--sec-pad-top) var(--seam);
+}
+#verify .v-head .h2 { max-width: var(--measure-h2); }
+#verify .v-head .lead { max-width: 760px; margin-top: var(--sp-24); }
+
+/* ---- the figure bar: 01 / 02 / 03, a 4 px ink bar on the active one; sticky under the nav at ≥ 1200 ------------- */
+.v-figs { grid-template-columns: minmax(0, 1fr); }
+.v-fig {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--sp-16);
+  min-height: 56px;
+  padding: var(--sp-12) var(--sp-16);
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+.v-fig::before {
+  content: '';
+  position: absolute;
+  inset: -1px -1px auto;
+  height: 4px;
+  background: var(--ink);
+  visibility: hidden;
+}
+.v-fig[aria-selected="true"] { color: var(--text); }
+.v-fig[aria-selected="true"]::before { visibility: visible; }
+.v-fig:hover { color: var(--text); }
+.v-fig:focus-visible { outline-offset: -4px; }
+.v-fig__n {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--fs-num-l);
+  line-height: var(--lh-num-l);
+  font-variant-numeric: tabular-nums;
+}
+.v-fig__label { min-width: 0; }
+@media (min-width: 768px) {
+  .v-figs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .v-fig { min-height: 64px; padding: var(--sp-12) var(--sp-24); }
+}
+@media (min-width: 1200px) {
+  /* final validation: stuck 1 px higher so its top border tucks under the nav's hairline (one line, not two) */
+  .v-figs { position: sticky; top: calc(var(--nav-total) - 1px); z-index: 3; }
+  .frow { scroll-margin-top: 64px; }       /* anchors land below the stuck bar */
+}
+
+/* ---- rows ------------------------------------------------------------------------------------------------------ */
+.v-rows { border-inline: 1px solid var(--line); }
+.frow {
+  container: frow / inline-size;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 400px;
+  padding: var(--cell-pad);
+}
+.frow + .frow { border-top: 1px solid var(--line); }
+.frow:last-child { border-bottom: 1px solid var(--line); }
+.frow:focus { outline: none; }
+
+.frow.is-split {
+  column-gap: var(--sp-40);
+  grid-template-columns: minmax(0, 1fr) var(--panel-w);
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "copy panel" "cta panel" "extras extras";
+}
+.frow.is-stack { grid-template-areas: "copy" "cta" "panel" "extras"; }
+
+.frow__copy { grid-area: copy; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.frow__chip { margin-bottom: var(--sp-24); line-height: 0; }
+.frow__body { margin-top: var(--sp-16); max-width: var(--measure-body); color: var(--text-soft); }
+.frow__cta { grid-area: cta; align-self: start; margin-top: var(--sp-32); }
+.frow__extras { grid-area: extras; margin-top: var(--sp-40); }
+.is-stack .frow__panel { margin-top: var(--sp-40); }
+.is-stack .frow__extras { margin-top: var(--sp-32); }
+
+/* ---- the figure: a paper cell holding a hairline frame with corner dots, the sprite on a card plate, a caption -- */
+.frow__panel {
+  grid-area: panel;
+  align-self: start;
+  min-width: 0;
+  padding: var(--panel-pad, 24px);
+  background: var(--paper);
+}
+.is-split .frow__panel { width: var(--panel-w); }
+.frow__frame {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: var(--sp-32) 8px var(--sp-64);
+  border: 1px solid var(--line-strong);
+}
+.frow__frame > .dot { z-index: 1; }
+.frow__plate {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--card);
+  color: var(--text);
+}
+.frow__art {
+  display: grid;
+  place-items: center;
+  width: var(--aw, 384px);
+  height: var(--ah, 192px);
+  line-height: 0;
+}
+.frow__fig {
+  position: absolute;
+  bottom: var(--sp-16);
+  left: var(--sp-16);
+  right: var(--sp-16);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-micro);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+}
+
+/* micro labels inside the plate (never on the sprite) */
+.frow__label {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  line-height: 16px;
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* row 1: the readout under the frame; its "1" turns blue while the players are in their `win` state */
+.frow__readout { margin-top: var(--sp-12); color: var(--text-soft); }
+.frow__one.is-win { color: var(--blue); }
+
+/* row 2: PHYSICAL / CRYPTOGRAPHIC SEPARATION, stacked in one cell so the swap never shifts layout */
+.frow__label--swap { display: grid; justify-items: center; margin-top: 12px; }
+.frow__label--swap > span { grid-area: 1 / 1; visibility: hidden; }
+.frow__label--swap[data-state="physical"] .frow__phys,
+.frow__label--swap[data-state="crypto"] .frow__crypto { visibility: visible; }
+.frow__label--swap[data-state="crypto"] { color: var(--blue); }
+
+/* row 3: schedule label + verdict stamp above the sprite; provider label + ΔE under the meter below it */
+.frow__lrow {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-left: calc(2 * var(--u, 4px));                 /* the first tile starts 2 art px in */
+}
+.frow__lrow--top { margin-bottom: 8px; padding-right: calc(5 * var(--u, 4px)); }   /* stamp ends on the meter's edge */
+.frow__lrow--bot { margin-top: 8px; min-height: 16px; }
+.frow__meter {
+  position: absolute;
+  top: 0;
+  left: calc(119.5 * var(--u, 4px));
+  transform: translateX(-50%);
+  color: var(--text-soft);
+  line-height: 16px;
+}
+.frow__stamp { display: inline-grid; }
+.frow__stamp > span {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  padding: 0 6px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--fs-micro);
+  line-height: 14px;
+  letter-spacing: var(--ls-caps);
+  text-align: center;
+  white-space: nowrap;
+}
+.frow__stamp-ok { color: var(--ramp-5); }
+.frow__stamp-no { color: var(--alert); background: var(--alert-tint); }
+.frow__stamp[data-state="accepted"] .frow__stamp-ok,
+.frow__stamp[data-state="rejected"] .frow__stamp-no { visibility: visible; animation: s3-thunk 166ms steps(1, end); }
+@keyframes s3-thunk { 0% { transform: translateY(-4px); } 50% { transform: translateY(1px); } 100% { transform: none; } }
+:root[data-motion="reduced"] .frow__stamp > span { animation: none; }
+
+/* ---- copy extras and strips ------------------------------------------------------------------------------------ */
+.frow__cap { color: var(--text-soft); }
+
+/* row 1: the stat pair in the copy column */
+.frow__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); align-self: stretch; margin-top: var(--sp-32); }
+.frow__stat { justify-content: space-between; gap: var(--sp-24); min-height: 168px; padding: var(--sp-32); }
+.frow__stat .num-xl { color: var(--text); }
+@media (max-width: 767.98px) { .frow__stat { min-height: 144px; padding: var(--sp-16); } }
+
+/* rows 1 and 2: two notes with a hairline on top */
+.frow__minis { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-24); }
+.frow__mini { display: flex; flex-direction: column; gap: var(--sp-8); padding-top: var(--sp-16); border-top: 1px solid var(--line); }
+@container frow (min-width: 560px) {
+  .frow__minis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-40); }
+}
+
+/* row 3: Test round (violet, as the T tiles) · Compute round (blue, as the C tiles) · Verdict */
+.frow__cards { grid-template-columns: minmax(0, 1fr); }
+.frow__card { gap: var(--sp-12); }
+.frow__card.is-test .h5 { color: var(--ramp-5); }
+.frow__card.is-compute .h5 { color: var(--blue); }
+@container frow (min-width: 700px) {
+  .frow__cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* ---- research list -------------------------------------------------------------------------------------------- */
+.research { padding-block: var(--seam); }
+.research__head { display: flex; flex-direction: column; gap: var(--sp-24); }
+.research__head .lead { max-width: var(--measure-lead); }
+.research__list { margin: var(--sp-40) 0 0; padding: 0; list-style: none; }
+.research__row { grid-template-columns: 128px minmax(0, 1fr) 200px 128px; }
+.research__row > .cell { gap: var(--sp-4); padding: var(--sp-24); }
+.research__year .num-l { color: var(--text); }
+.research__authors { color: var(--text); }
+.research__title { margin-top: var(--sp-4); }
+.research__gives { margin-top: var(--sp-4); color: var(--text-soft); }
+.research__venue .mono { color: var(--text-soft); }
+.research__link { flex-direction: row; align-items: flex-start; justify-content: space-between; text-decoration: none; }
+.research__glyph { display: inline-flex; line-height: 0; color: var(--text-soft); }
+.research__link:is(:hover, :focus-visible) .research__glyph { color: var(--text); animation: s3-out 166ms steps(1, end); }
+@keyframes s3-out { 0%, 99% { transform: translate(4px, -4px); } 100% { transform: none; } }
+:root[data-motion="reduced"] .research__glyph { animation: none !important; }
+
+@media (max-width: 1023.98px) {
+  .research__row {
+    grid-template-columns: 112px minmax(0, 1fr) 112px;
+    grid-template-areas: "year main link" "year venue link";
+  }
+  .research__year { grid-area: year; }
+  .research__main { grid-area: main; }
+  .research__venue { grid-area: venue; }
+  .research__link { grid-area: link; }
+  .research__row > .cell { padding: var(--sp-16); }
+}
+
+/* ---- sm (<768): the paper cell bleeds to the row's lines ------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  .frow { min-height: 0; }
+  .frow__panel { margin-inline: calc(-1 * var(--cell-pad)); }
+  .frow__frame { padding: var(--sp-24) 8px var(--sp-64); }
+  .frow__extras .cell { padding: var(--sp-16); }
+  .research__row {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "year venue" "main main" "link link";
+  }
+  .research__year { padding-block: var(--sp-12) !important; }
+  .research__venue { justify-content: center; padding-block: var(--sp-12) !important; }
+  .research__link { align-items: center; min-height: 56px; }
+  .research__row + .research__row { margin-top: var(--sp-16); border-top: 1px solid var(--line); }
+}

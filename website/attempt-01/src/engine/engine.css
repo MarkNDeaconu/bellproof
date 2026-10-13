@@ -1,0 +1,66 @@
+/* Engine-owned CSS: pixel containers, blocks, strata. Imported by main.ts and preview.ts.
+   Layout tokens live in styles/tokens.css (layout-core); this file only needs --unit and --module.
+   integrator: everything sits in the lowest cascade layer `bp.engine`, so any unlayered section rule (e.g. top.css's
+   `.hero__stage { position:absolute }`) beats these defaults whatever order Vite injects the files in (dev hoists the
+   section-CSS glob above this import; the build does not). */
+@layer bp.engine {
+
+.px {
+  --unit: 4px;
+  position: relative;
+  display: inline-block;
+  inline-size: calc(var(--w, 16) * var(--unit));
+  block-size: calc(var(--h, 16) * var(--unit));
+  line-height: 0;
+  vertical-align: top;
+  contain: strict;
+}
+.px > canvas.px,
+canvas.px {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.px > canvas.px { position: absolute; inset: 0; margin: auto; }
+.px--over { position: absolute; inset: 0; }
+
+.icon { display: inline-block; vertical-align: middle; shape-rendering: crispEdges; }
+
+/* blocks */
+.stage { position: relative; overflow: hidden; }
+.block { position: absolute; left: 0; top: 0; will-change: transform; }
+.block--diamond { background: transparent; }
+.block--diamond > canvas.band { display: block; image-rendering: pixelated; }
+.block .rider { position: absolute; }
+
+/* strata and staircase */
+.strata { position: relative; display: flex; flex-direction: column; overflow: hidden; }
+.strata__band { width: 100%; }
+.staircase { position: relative; overflow: hidden; }
+.staircase > canvas.band { display: block; image-rendering: pixelated; }
+.grid-on-colour {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(14,20,36,.10) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(14,20,36,.10) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 80px;
+  background-position: 48px 0, 0 0;
+  background-repeat: no-repeat, repeat-y;
+}
+.strata__arc {
+  position: absolute; right: -256px; bottom: -256px; width: 512px; height: 512px;
+  border: 1px solid rgba(14,20,36,.10); border-radius: 50%; pointer-events: none;
+}
+
+/* reveal + typewriter cursor */
+/* integrator fix (queue #2): the clip insets are negative (−12px) so the revealed state never clips focus rings
+   (2px ring + 2px offset) or glyphs that overhang the box; the rise still wipes from the bottom edge. */
+[data-reveal] { clip-path: inset(-12px -12px 100% -12px); transform: translateY(16px); }
+[data-reveal].in { clip-path: inset(-12px); transform: none; transition: clip-path .5s cubic-bezier(.2,.7,.2,1) var(--reveal-delay, 0ms), transform .5s cubic-bezier(.2,.7,.2,1) var(--reveal-delay, 0ms); }
+:root[data-motion="reduced"] [data-reveal] { clip-path: none; transform: none; transition: none; }
+.cursor { display: inline-block; width: 8px; height: 20px; background: currentColor; vertical-align: -3px; margin-left: 2px; }
+/* after typing: hold, then blink 3 cycles (1 s each, stepped), then stay on. No JS, no rAF. */
+.cursor.blink { animation: bp-blink 1s steps(2, jump-none) var(--hold, 2000ms) 3; }
+@keyframes bp-blink { from { visibility: visible; } to { visibility: hidden; } }
+:root[data-motion="reduced"] .cursor { animation: none; }
+}

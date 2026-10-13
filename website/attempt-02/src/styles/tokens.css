@@ -1,0 +1,240 @@
+/* Bellproof design tokens · design-spec §1–§3. Owner: layout-core.
+   The sprite palette (src/engine/palette.ts) is the same table: `npm run validate` fails if a hex here drifts.
+   Primitive tokens first (one value each, in :root), then breakpoint overrides, then colour scopes. */
+
+/* Shared layers, in cascade order. Section CSS (styles/sections/*.css) is unlayered, so it always wins
+   over these, whatever order the bundler emits the files in. */
+@layer bp.engine, bp.tokens, bp.base, bp.type, bp.grid, bp.components;
+
+@layer bp.tokens {
+:root {
+  /* ---- 1.1 surfaces ------------------------------------------------------------------------- */
+  --card: #FBFAF7;            /* page canvas, nav, hero, light cells */
+  --paper: #F4F2ED;           /* alternate tint, inactive tabs, hover of cells */
+  --paper-2: #ECE9E1;         /* deeper panels */
+  --ink: #0E1424;             /* dark band, dark cards, primary buttons */
+  --ink-2: #16203A;           /* secondary surface inside dark scopes */
+
+  /* ---- 1.2 ink (text) ----------------------------------------------------------------------- */
+  --text: #0E1424;
+  --text-soft: #475069;
+  --text-muted: #4F5872;      /* rev 1 (LC6, exp #16): 6.77:1 on card, 6.32 on paper, 5.83 on paper-2 (was #5C667F) */
+  --on-dark: #F4F2ED;
+  --on-dark-body: #B9C2D6;
+  --on-dark-muted: #7F89A2;
+  --on-dark-accent: #8FAEFF;
+
+  /* ---- 1.3 lines ---------------------------------------------------------------------------- */
+  --hairline: #DEDBD3;
+  --hairline-strong: #C9C5BB;
+  --hairline-dark: #2A3655;
+  --grid-on-colour: rgba(14, 20, 36, .10);
+  --dot: #0E1424;
+  --focus: #2F5BEA;
+
+  /* ---- 1.4 actions -------------------------------------------------------------------------- */
+  --action: #0E1424;
+  --action-hover: #16203A;
+  --action-outline-hover: #F4F2ED;
+  --ghost: rgba(14, 20, 36, .05);
+  --ghost-hover: rgba(14, 20, 36, .10);
+  --ghost-on-dark: rgba(244, 242, 237, .08);
+  --ghost-on-dark-hover: rgba(244, 242, 237, .14);
+
+  /* ---- 1.5 the ramp (flat blocks only) ------------------------------------------------------ */
+  --ramp-0: #C9D5FA;          /* mist */
+  --ramp-1: #8FAEFF;          /* azure */
+  --ramp-2: #5E87F1;          /* cornflower */
+  --ramp-3: #2F5BEA;          /* blue (brand) */
+  --ramp-4: #6331DF;          /* indigo */
+  --ramp-5: #7202BC;          /* violet */
+  --ramp-6: #321B63;          /* night */
+  --blue: var(--ramp-3);
+  --blue-light: var(--ramp-1);
+
+  /* ---- 1.6 alert (failure states only) ------------------------------------------------------ */
+  --alert: #C0105E;
+  --alert-tint: #F9E1EC;
+
+  /* ---- 1.7 sprite palette, by name (for CSS that must match pixel art exactly) -------------- */
+  --px-ink: #0E1424;
+  --px-night: #321B63;
+  --px-navy: #2A3655;
+  --px-slate: #475069;
+  --px-steel: #7F89A2;
+  --px-silver: #B9C2D6;
+  --px-platinum: #E3E8F2;
+  --px-hairline: #DEDBD3;
+  --px-paper: #F4F2ED;
+  --px-white: #FFFFFF;
+  --px-violet: #7202BC;
+  --px-indigo: #6331DF;
+  --px-blue: #2F5BEA;
+  --px-cornflower: #5E87F1;
+  --px-azure: #8FAEFF;
+  --px-mist: #C9D5FA;
+  --px-glow: #D7E3FF;
+  --px-lilac: #C5B0F6;
+  --px-raspberry: #C0105E;
+  --px-raspberry-tint: #F9E1EC;
+
+  /* ---- scope-able roles (re-mapped by .on-dark / .on-blue, see bottom) ----------------------- */
+  --surface: var(--card);
+  --surface-2: var(--paper);
+  --cell-bg: var(--card);       /* a .cell's own surface (light card, even inside paper sections) */
+  --cell-hover: var(--paper);
+  --accent-text: var(--blue);   /* eyebrows, highlight spans */
+  --line: var(--hairline);      /* .cells gaps and every structural rule */
+  --line-strong: var(--hairline-strong);
+  --focus-ring: var(--focus);
+
+  /* ---- 2. type ------------------------------------------------------------------------------ */
+  --font-display: 'Space Grotesk', 'Space Grotesk Fallback', 'Space Grotesk Fallback A', sans-serif;
+  --font-body: 'IBM Plex Sans', 'IBM Plex Sans Fallback', 'IBM Plex Sans Fallback A', sans-serif;
+  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', 'Courier New', monospace;   /* never Menlo */
+
+  /* scale · lg ≥1024 (md and sm below) */
+  --fs-display: 88px;  --lh-display: 88px;  --ls-display: -0.02em;
+  --fs-h2: 56px;       --lh-h2: 60px;       --ls-h2: -0.01em;
+  --fs-h3: 40px;       --lh-h3: 48px;       --ls-h3: -0.01em;
+  --fs-h4: 28px;       --lh-h4: 36px;
+  --fs-h5: 20px;       --lh-h5: 28px;
+  --fs-h6: 16px;       --lh-h6: 24px;       --ls-h6: 0.01em;
+  --fs-lead: 20px;     --lh-lead: 30px;     --ls-lead: -0.01em;
+  --fs-body: 16px;     --lh-body: 24px;
+  --fs-small: 13px;    --lh-small: 20px;
+  --fs-num-xl: 72px;   --lh-num-xl: 72px;   --ls-num-xl: -0.02em;
+  --fs-num-l: 32px;    --lh-num-l: 40px;
+  --fs-mono: 14px;     --lh-mono: 20px;
+  --fs-eyebrow: 12px;  --lh-eyebrow: 16px;
+  --fs-micro: 12px;    --lh-micro: 16px;   /* rev 1 (LC6): 12px, was 11 */
+  --ls-caps: 0.08em;
+
+  /* ---- 3. grid, spacing, lines -------------------------------------------------------------- */
+  --unit: 4px;                /* U: CSS px per art px (sprites) */
+  --band: 8px;                /* B: CSS px per band px (blocks, diamonds, strata) */
+  --module: 128px;            /* M */
+  --gutter: 40px;
+  --content-max: 1728px;
+  --nav-h: 48px;
+  /* final validation: the shipped nav box is 48 px in all (index.html's critical `.nav{height:48px}` under border-box,
+     its hairline included), so 49 left a 1-px see-through seam under the stuck figure bar and the menu panel */
+  --nav-total: 48px;
+  --cell-pad: 40px;
+  --sec-pad-top: 120px;       /* above a headline block · integrator R2: 160 → 120, the value revision 1 gave trust (and
+                                 sections-1 used for flip and cost), so every section opens on the same rhythm */
+  --seam: 80px;               /* mid-section seams */
+  --sp-4: 4px; --sp-8: 8px; --sp-12: 12px; --sp-16: 16px; --sp-24: 24px; --sp-32: 32px;
+  --sp-40: 40px; --sp-64: 64px; --sp-80: 80px; --sp-128: 128px; --sp-160: 160px;
+  --measure-h2: 880px;
+  --measure-body: 560px;
+  --measure-lead: 640px;
+
+  /* ---- 3.4 radii and shadow ----------------------------------------------------------------- */
+  --r-control: 4px;           /* buttons, inputs, tags */
+  --r-tabcard: 8px;           /* the sticky tab card */
+  --r-pill: 999px;
+  --shadow-menu: 0 8px 24px rgba(14, 20, 36, .08);
+
+  /* ---- motion ------------------------------------------------------------------------------- */
+  --ease-ui: cubic-bezier(.4, 0, .2, 1);
+  --ease-rise: cubic-bezier(.2, .7, .2, 1);
+  --dur-ui: 150ms;
+  --dur-panel: 300ms;
+  --dur-step: 166ms;          /* the two-tick "pixel step" (2 × 83ms) */
+}
+
+/* ---- md 768–1023 -------------------------------------------------------------------------- */
+@media (max-width: 1023.98px) {
+  :root {
+    --module: 64px;
+    --gutter: 16px;
+    --cell-pad: 24px;
+    --sec-pad-top: 80px;
+    --seam: 64px;
+
+    --fs-display: 64px;  --lh-display: 64px;
+    --fs-h2: 44px;       --lh-h2: 48px;
+    --fs-h3: 32px;       --lh-h3: 40px;       --ls-h3: 0em;
+    --fs-h4: 24px;       --lh-h4: 32px;
+    --fs-lead: 18px;     --lh-lead: 28px;
+    --fs-num-xl: 56px;   --lh-num-xl: 56px;
+    --fs-num-l: 28px;    --lh-num-l: 36px;
+  }
+}
+
+/* ---- sm <768 ------------------------------------------------------------------------------ */
+@media (max-width: 767.98px) {
+  :root {
+    --cell-pad: 16px;
+    --sec-pad-top: 64px;
+    --seam: 48px;
+
+    --fs-display: 40px;  --lh-display: 44px;
+    --fs-h2: 30px;       --lh-h2: 36px;       --ls-h2: 0em;
+    --fs-h3: 26px;       --lh-h3: 32px;
+    --fs-h4: 22px;       --lh-h4: 28px;
+    --fs-h5: 18px;       --lh-h5: 26px;
+    --fs-lead: 17px;     --lh-lead: 26px;
+    --fs-num-xl: 44px;   --lh-num-xl: 44px;
+    --fs-num-l: 24px;    --lh-num-l: 32px;
+    --fs-mono: 13px;
+    --fs-eyebrow: 11px;
+  }
+}
+
+/* ---- colour scopes ------------------------------------------------------------------------
+   Every component reads --text*, --surface, --line, --accent-text and --focus-ring, so dropping a
+   block into a dark or blue scope re-colours it. `.on-light` resets a light card inside a dark scope. */
+.on-dark,
+[data-tint="ink"] {
+  --surface: var(--ink);
+  --surface-2: var(--ink-2);
+  --cell-bg: var(--ink);
+  --cell-hover: var(--ink-2);
+  --text: var(--on-dark);
+  --text-soft: var(--on-dark-body);
+  --text-muted: var(--on-dark-muted);
+  --accent-text: var(--on-dark-accent);
+  --line: var(--hairline-dark);
+  --line-strong: var(--hairline-dark);   /* rev 1 (LC6, qa-originality "out of lane"): palette navy #2A3655, was off-palette #3B4868 */
+  --focus-ring: var(--on-dark-accent);
+  --ghost: var(--ghost-on-dark);
+  --ghost-hover: var(--ghost-on-dark-hover);
+  color: var(--text);
+}
+
+.on-blue,
+[data-tint="blue"] {
+  --surface: var(--ramp-3);
+  --surface-2: var(--ramp-4);
+  --cell-bg: var(--ramp-3);
+  --cell-hover: var(--ramp-4);
+  --text: var(--on-dark);
+  --text-soft: var(--on-dark);      /* rev 1 (LC6, a11y #2): paper on blue 4.93:1; mist (3.78) only for text ≥ 24px */
+  --text-muted: var(--on-dark);
+  --accent-text: var(--on-dark);
+  --line: var(--grid-on-colour);
+  --line-strong: rgba(244, 242, 237, .4);
+  --focus-ring: var(--card);
+  color: var(--text);
+}
+
+.on-light {
+  --surface: var(--card);
+  --surface-2: var(--paper);
+  --cell-bg: var(--card);
+  --cell-hover: var(--paper);
+  --text: #0E1424;
+  --text-soft: #475069;
+  --text-muted: #4F5872;
+  --accent-text: var(--blue);
+  --line: var(--hairline);
+  --line-strong: var(--hairline-strong);
+  --focus-ring: var(--focus);
+  --ghost: rgba(14, 20, 36, .05);
+  --ghost-hover: rgba(14, 20, 36, .10);
+  color: var(--text);
+}
+
+} /* @layer bp.tokens */

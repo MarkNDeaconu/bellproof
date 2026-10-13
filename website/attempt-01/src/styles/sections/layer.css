@@ -1,0 +1,181 @@
+/* Section 5 · #layer (design-spec §5.5). Owner: sections-2. Unlayered: beats the shared layers.
+   A centred head · the diagram (Clients | lane | Bellproof | lane | Quantum clouds) · closing lines ·
+   the with/without table. The diagram's lanes are hairline "roads" whose canvases sit exactly level
+   with the cells' 96-px sprites, so the packets travel from sprite to sprite. */
+
+.layer {
+  padding-block: var(--sec-pad-top) var(--seam);
+}
+
+/* ---- A · head ------------------------------------------------------------------------------- */
+.layer__head {
+  max-width: var(--measure-h2);
+  margin-inline: auto;
+  text-align: center;
+}
+.layer__head .lead { max-width: var(--measure-lead); margin: var(--sp-24) auto 0; }
+
+/* ---- B · diagram ------------------------------------------------------------------------------
+   wide (≥1280): [1fr] [192] [1.25fr] [192] [1fr]; the lanes' canvases share the sprites' row.
+   stacked (<1280): cells full width and centred, the lanes upright between them. */
+.layer__diagram {
+  --sprite: 96px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: var(--seam);
+}
+
+.layer__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: var(--cell-pad);
+  border: 1px solid var(--hairline);
+  background: var(--card);
+  text-align: center;
+}
+.layer__cell--core { background: var(--ramp-3); border-color: var(--ramp-3); }
+
+.layer__sprite {
+  display: grid;
+  place-items: end center;
+  width: var(--sprite);
+  height: var(--sprite);
+  flex: none;
+}
+.layer__sprite > .px { display: block; }
+
+.layer__title { margin-top: var(--sp-24); }
+.layer__body { margin-top: var(--sp-8); color: var(--text-soft); max-width: 32ch; }
+.layer__tag {
+  align-self: center;
+  margin-top: var(--sp-24);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Bellproof: two mono-ruled rows on blue, paper text, mist labels, 40%-paper dividers */
+.layer__rows {
+  width: 100%;
+  max-width: 360px;
+  margin-top: var(--sp-16);
+  text-align: left;
+}
+.layer__row {
+  display: grid;
+  gap: var(--sp-4);
+  padding-block: var(--sp-12);
+  border-top: 1px solid rgba(244, 242, 237, .4);
+}
+.layer__row:last-child { padding-bottom: 0; }
+.layer__row dt {
+  color: var(--ramp-0);
+  font-size: var(--fs-micro);
+  line-height: var(--lh-micro);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+}
+.layer__row dd { margin: 0; color: var(--on-dark); }
+
+/* lanes, stacked: an upright road between two cells, labels pointing at their track */
+.layer__lane {
+  --half: round(down, calc((100% - 128px) / 2), 1px);
+  display: grid;
+  grid-template-columns: var(--half) 96px minmax(0, 1fr);
+  grid-template-areas: "fwd track ret";
+  align-items: center;
+  column-gap: var(--sp-16);
+}
+.layer__track {
+  grid-area: track;
+  display: grid;
+  place-items: center;
+  height: 192px;
+  border-inline: 1px solid var(--hairline);
+  box-sizing: content-box;
+  margin-inline: -1px;              /* the canvas is exactly 96 wide between the two hairlines */
+}
+.layer__packets { display: block; width: 96px; height: 192px; }
+.layer__packets > .px { display: block; }
+.layer__label { color: var(--text-soft); margin: 0; }
+.layer__label--fwd { grid-area: fwd; justify-self: end; text-align: right; }
+.layer__label--ret { grid-area: ret; justify-self: start; }
+
+/* stacked on tablets and small laptops: a compact vertical flow chart, not three page-wide slabs */
+@media (min-width: 768px) and (max-width: 1279.98px) {
+  .layer__diagram { width: min(100%, 640px); margin-inline: auto; }
+}
+
+@media (min-width: 1280px) {
+  .layer__diagram {
+    /* whole-pixel columns so every sprite lands on the device grid: side = (W − 384) / 3.1, floored */
+    --side: round(down, calc((100% - 384px) / 3.1), 1px);
+    grid-template-columns: var(--side) 192px minmax(0, 1fr) 192px var(--side);
+    min-height: 360px;
+  }
+  .layer__cell { align-items: flex-start; text-align: left; }
+  .layer__body { max-width: none; }
+  .layer__tag { align-self: flex-start; margin-top: auto; text-align: left; }
+  .layer__cell--side .layer__body { margin-bottom: var(--sp-24); }
+  .layer__sprite { place-items: end start; }
+  .layer__rows { max-width: none; }
+
+  /* the lane: label · hairline · 96-px canvas · hairline · label; the canvas top sits on the
+     cells' content top (border 1 + padding), so packets ride level with the sprites */
+  .layer__lane {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: calc(var(--cell-pad) + 1px - 1px - 8px - 20px);
+    column-gap: 0;
+  }
+  .layer__track {
+    height: 96px;
+    border-inline: 0;
+    border-block: 1px solid var(--hairline);
+    margin: 0;
+  }
+  .layer__packets { width: 192px; height: 96px; }
+  .layer__label { justify-self: auto; text-align: center; white-space: nowrap; }
+  .layer__label--fwd { margin-bottom: var(--sp-8); }
+  .layer__label--ret { margin-top: var(--sp-8); }
+}
+
+/* ---- C · closing lines: the claim left, the pull quote and its note right ----------------- */
+.layer__close {
+  display: grid;
+  gap: var(--sp-40);
+  margin-top: var(--seam);
+}
+.layer__line { max-width: 18em; }
+.layer__line .em { display: inline-block; }          /* the stake line wraps as one unit */
+.layer__pull { color: var(--text); }
+.layer__pull p { margin: 0; }
+.layer__note { margin-top: var(--sp-16); padding-left: 28px; color: var(--text-soft); max-width: 44ch; }
+@media (min-width: 1024px) {
+  .layer__close { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; }
+  .layer__line { grid-column: 1 / span 7; }
+  .layer__quote { grid-column: 8 / span 5; }
+}
+
+/* ---- D · with / without ------------------------------------------------------------------------ */
+.layer__compare {
+  margin-top: var(--seam);
+  padding-top: var(--seam);
+  border-top: 1px solid var(--hairline);
+}
+.layer__compare-head { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-16); }
+.layer__compare-head .h3 { max-width: 20em; }
+.layer__table-wrap { margin-top: var(--sp-40); }
+.layer__table { table-layout: fixed; }
+.layer__col-k { width: 28%; }
+.layer__table thead td { border-bottom: 1px solid var(--hairline); }
+.layer__table tbody th { padding-right: var(--sp-24); }
+.layer__table :is(th, td):first-child { padding-left: 0; }
+.layer__cta { margin-top: var(--sp-40); }
+.layer__cta .link { font-family: var(--font-display); }
+@media (max-width: 767.98px) {
+  .layer__table thead td { display: none; }
+  .layer__table-wrap { margin-top: var(--sp-24); }
+}

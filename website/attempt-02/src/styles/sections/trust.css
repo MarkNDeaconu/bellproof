@@ -1,0 +1,101 @@
+/* Trust · design-spec §5.2 as amended by revision-1 §1.2. Owner: sections-1.
+   A. centred statement + the domain ledger (six cells checked one by one) · B. four cells. */
+
+.trust { padding: var(--sec-pad-top) 0 var(--seam); }
+@media (min-width: 1024px) { .trust { padding-top: 120px; } }
+
+/* ---- A · statement ---------------------------------------------------------------------------- */
+.trust__head { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.trust__h2 { max-width: 800px; margin-top: var(--sp-16); }
+.trust__lead { max-width: var(--measure-lead); margin-top: var(--sp-24); }
+
+/* ---- A · the ledger ----------------------------------------------------------------------------
+   ≥ 1280: one row of 6 cards, M (128) tall: [tag icon ……… check slot] / name / mono tag.
+   768–1279: 3 × 2, each 96 tall: [tag icon][name] ……… [check slot] / mono tag (the 6-up row can't hold a 155 px tag).
+   < 768: 2 × 3 cards, as at ≥ 1280. Unchecked cells show the section's paper; a check turns the cell --card. */
+.trust__ledger {
+  margin: var(--sp-24) 0 0;
+  padding: 0;
+  list-style: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.trust__entry {
+  --cell-bg: var(--paper);
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 28px;
+  grid-template-rows: 32px auto auto;
+  column-gap: var(--sp-12);
+  row-gap: 0;
+  padding: var(--sp-16);
+}
+.trust__ico { grid-area: 1 / 1; line-height: 0; }
+.trust__ico > .px { display: block; }
+.trust__slot {
+  grid-area: 1 / 3;
+  align-self: center;
+  position: relative;
+  display: block;
+  width: 28px;
+  height: 28px;
+  line-height: 0;
+  color: var(--blue);
+}
+.trust__slot .icon { display: block; visibility: hidden; }
+/* the empty slot: one 4×4 hairline-strong dot in the middle (the site's registration-dot vocabulary) */
+.trust__slot::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 4px;
+  height: 4px;
+  background: var(--line-strong);
+}
+.trust__name { grid-row: 2; grid-column: 1 / -1; margin-top: var(--sp-12); color: var(--text); }
+.trust__tag { grid-row: 3; grid-column: 1 / -1; margin-top: var(--sp-4); color: var(--text-muted); }
+
+.trust__entry.is-checked { --cell-bg: var(--card); }
+.trust__entry.is-checked .trust__slot .icon { visibility: visible; }
+.trust__entry.is-checked .trust__slot::before { display: none; }
+.trust__entry.is-checked .trust__tag { color: var(--text-soft); }
+.trust__entry.is-lift .trust__slot .icon { visibility: hidden; }        /* re-stamp: the check is off the page for a tick */
+/* the stamp's first tick: the check one art px high and a 1-tick white flash on the cell border */
+.trust__entry.is-stamp { outline: 1px solid var(--px-white); outline-offset: 0; z-index: 1; }
+.trust__entry.is-stamp .trust__slot { transform: translateY(-4px); }
+
+@media (min-width: 768px) {
+  .trust__ledger { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .trust__entry {
+    grid-template-rows: 32px auto;
+    padding: 18px 20px;
+    min-height: 96px;
+  }
+  .trust__name { grid-row: 1; grid-column: 2; margin-top: 0; align-self: center; }
+  .trust__tag { grid-row: 2; margin-top: var(--sp-12); }
+}
+@media (min-width: 1280px) {
+  .trust__ledger { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .trust__entry { grid-template-rows: 32px auto auto; padding: 20px; min-height: 128px; }
+  .trust__name { grid-row: 2; grid-column: 1 / -1; margin-top: var(--sp-12); }
+  .trust__tag { grid-row: 3; margin-top: var(--sp-4); }
+}
+
+/* ---- B · four cells ---------------------------------------------------------------------------- */
+.trust__cells { margin-top: var(--sp-40); }
+.trust__cell .cell__foot { margin-top: auto; }
+.trust__cell .cell__body { margin-top: -8px; }                              /* title → body 8, body → tag ≥ 16 */
+.trust__cell-ico { display: block; line-height: 0; height: 80px; }          /* icon row: the 80 px scale sets the row */
+.trust__cell-ico > .px { display: block; }
+.trust__cell-ico:not(.trust__cell-ico--scale) > .px { margin-top: 8px; }       /* 64 px icons centred on the scale's row */
+
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  .trust__cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }   /* 4-up only from 1200: no "held-/out" breaks */
+}
+@media (min-width: 1400px) {
+  .trust__cell .tag { white-space: nowrap; }       /* "COST: ONE CHEAP ON-CHAIN CHECK" fits once the cell is ≥ 340 */
+}
+@media (max-width: 767.98px) {
+  .trust__cells { margin-top: var(--sp-32); }
+  .trust__cell-ico { height: auto; }               /* one column: no shared icon row to line up */
+  .trust__cell-ico:not(.trust__cell-ico--scale) > .px { margin-top: 0; }
+}

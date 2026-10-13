@@ -1,0 +1,242 @@
+/* Hero · design-spec §5.1 "Lowered into frame". Owner: sections-1.
+   Frame (full-bleed): [M rail] [middle: content row + M floor row] [M rail]; the block stage spans the frame behind
+   everything (floor = frame bottom). Content row = [text 1fr] [fridge cell 384]. md: left rail only, fridge cell 288,
+   the pill becomes a 64 px bar under the floor. sm: text, then a 480 px fridge cell holding the stage, then the pill bar.
+   Then the research strip (6 cells, M tall). */
+
+/* The skeleton's hero copy (layout-core's first-paint shell) stays invisible until this section mounts: otherwise it
+   paints, vanishes and rises again. The intro is JS-driven, as is every string on the page. */
+.hero-shell__text, .hero-shell__fridge { visibility: hidden; }
+
+/* ---- frame --------------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--module) minmax(0, 1fr) var(--module);
+  min-height: max(800px, calc(100dvh - 160px));
+  overflow: hidden;
+}
+.hero > .rail { position: relative; z-index: 0; width: auto; }
+.hero > .arc,
+.hero > .rail { opacity: 0; transition: opacity 300ms linear; }
+.is-go .hero > .arc,
+.is-go .hero > .rail,
+:root[data-motion="reduced"] .hero > .arc,
+:root[data-motion="reduced"] .hero > .rail { opacity: 1; }
+.hero__arcdot { --x: 100%; --y: 243px; }
+
+.hero__stage { position: absolute; inset: 0; z-index: 1; }
+.is-pre-intro .hero__stage { visibility: hidden; }  /* blocks wait outside the frame until intro() */
+.hero__stage--cell { display: none; }
+
+.hero__main {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) var(--module);
+  min-width: 0;
+}
+.hero__content { display: grid; grid-template-columns: minmax(0, 1fr) 384px; min-width: 0; }
+.hero__floor { pointer-events: none; }
+
+/* ---- text column ---------------------------------------------------------------------------- */
+.hero__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: safe center;
+  min-width: 0;
+  min-height: 0;
+  padding: 64px 0 40px 40px;                /* 64 (not 80) so the strip still peeks at 900 tall */
+}
+.hero__h1 { max-width: 760px; white-space: nowrap; text-wrap: initial; }
+.hero__lines { display: block; }
+.hero__line {
+  display: inline-block;
+  vertical-align: top;
+  overflow: hidden;
+  /* room for ascenders/descenders inside the mask, pulled back so the line box is unchanged */
+  padding: 0.08em 0.1em 0.14em 0.06em;
+  margin: -0.08em -0.1em -0.14em -0.06em;
+}
+.hero__line-in { display: block; transform: translateY(112%); }
+.is-text .hero__line-in {
+  transform: none;
+  transition: transform 600ms var(--ease-rise) calc(400ms + var(--i, 0) * 150ms);
+}
+.hero__sphere {
+  display: inline-block;
+  vertical-align: -6px;
+  margin: 0 0.08em 0 0.04em;
+  line-height: 0;
+}
+.hero__sphere > .hero__sphere-lg { display: block; }
+.hero__sphere > .hero__sphere-sm { display: none; }
+.hero__sphere .px { visibility: hidden; transition: visibility 0s linear calc(1000ms + var(--i, 0) * 150ms); }
+.is-text .hero__sphere .px { visibility: visible; }
+
+.hero__lead { max-width: var(--measure-body); margin-top: var(--sp-24); }
+.hero__btns { margin-top: var(--sp-32); }
+.hero__ticker { margin-top: var(--sp-24); min-height: var(--lh-mono); }
+.hero__ticker-text { white-space: pre-wrap; }
+.hero__tag { visibility: hidden; }
+.hero__tag.in { visibility: visible; }
+.hero__pillwrap { position: relative; margin-top: var(--sp-24); max-width: 100%; }
+.hero__pill { position: relative; max-width: 100%; }
+.hero__pill .pill__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* rise reveals (lead, buttons, pill): clip from the bottom + 16px rise, 500ms, timed from the intro start */
+.hero__rise { clip-path: inset(0 0 100% 0); transform: translateY(16px); }
+.is-text .hero__rise {
+  clip-path: inset(-64px -8px -8px -8px);   /* the pill's peek lives 56px above it: keep it inside the clip */
+  transform: none;
+  transition: clip-path 500ms var(--ease-rise) var(--d, 0ms), transform 500ms var(--ease-rise) var(--d, 0ms);
+}
+.is-landed .hero__rise { clip-path: none; }
+
+/* the pill peek: a qubit creature behind the pill, masked by the pill's top edge */
+.hero__peek {
+  position: absolute;
+  left: 4px;
+  bottom: 100%;
+  width: 48px;
+  height: 56px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+.hero__peek-px { position: absolute; left: 0; bottom: 0; }
+
+/* ---- fridge cell ---------------------------------------------------------------------------- */
+.hero__fridge { position: relative; min-width: 0; }
+.hero__fridge-fig { position: absolute; top: 0; left: calc(50% - 112px); margin: 0; line-height: 0; z-index: 2; }
+.hero__labels {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.hero__label {
+  position: absolute;
+  left: 0;
+  top: calc(var(--row) * 4px - 10px);
+  width: calc(50% - 112px + var(--pl) * 4px - 4px);   /* ends 4px before the plate's left edge */
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-mono);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 166ms steps(2, jump-end);
+}
+.hero__label.in,
+:root[data-motion="reduced"] .hero__label { opacity: 1; }
+.hero__leader {
+  flex: none;
+  width: calc(var(--pl) * 4px + 4px);
+  height: 1px;
+  margin-left: 8px;
+  background: repeating-linear-gradient(to right, var(--hairline-strong) 0 4px, transparent 4px 8px);
+}
+.hero__bit {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--px-azure);
+  pointer-events: none;
+  z-index: 3;
+}
+.hero__spark {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  z-index: 3;
+  --c: var(--px-white);
+  background:
+    linear-gradient(var(--c), var(--c)) 4px 0 / 4px 12px no-repeat,
+    linear-gradient(var(--c), var(--c)) 0 4px / 12px 4px no-repeat;
+}
+.hero__spark.is-2 { --c: var(--px-azure); }
+
+/* ---- pill bar (md/sm) ------------------------------------------------------------------------ */
+.hero__pillbar { display: none; }
+
+/* ---- research strip (6 cells, M tall) -------------------------------------------------------- */
+.hero-strip { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.hero-strip > .cell { min-height: var(--module); padding: var(--sp-24); gap: var(--sp-4); }
+.hero-strip__label { justify-content: center; }
+.hero-strip__cite { padding-right: 48px; }
+.hero-strip__glyph { position: absolute; right: var(--sp-24); bottom: var(--sp-24); line-height: 0; color: var(--text-soft); }
+
+/* ============================================================ below 1440: md geometry
+   The lg hero (two 128 rails + a 384 fridge cell beside a 760px headline) only fits from 1440 up: "Verified ◉ quantum"
+   measures 772px at 88px. Below that the hero takes the design's md geometry (M 64, left rail only, 288 fridge cell,
+   the pill as a 64px bar under the floor) while the rest of the page keeps its own breakpoint. */
+@media (max-width: 1439.98px) {
+  .hero { --module: 64px; grid-template-columns: var(--module) minmax(0, 1fr); min-height: 0; }
+  .hero > .rail--right { display: none; }
+  .hero__arcdot { --y: 256px; }
+  .hero__content { grid-template-columns: minmax(0, 1fr) 288px; }
+  .hero__text { padding: 80px 24px 40px; }
+  .hero__h1 { white-space: normal; max-width: none; }
+  .hero__pillwrap { display: none; }
+  .hero__fridge-fig { left: auto; right: 16px; }     /* 16px in from the edge so the labels clear the headline */
+  .hero__label { width: calc(100% - 240px + var(--pl) * 4px - 4px); }
+  .hero__pillbar { display: block; }
+  .hero__pillbar .pill { display: flex; width: 100%; height: 64px; padding: 8px var(--gutter) 8px 8px; border-radius: 0; border-width: 1px 0 0; }
+  .hero__pillbar .pill__label { flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+/* the headline steps down where its column cannot hold the 88px lines (measured: "computation," is 413px at 64px) */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .hero__h1 { font-size: 64px; line-height: 64px; }
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .hero__h1 { font-size: 56px; line-height: 60px; }
+}
+@media (max-width: 1023.98px) {
+  .hero-strip > .cell { min-height: 112px; padding: var(--sp-16); }
+  .hero-strip__glyph { right: var(--sp-16); bottom: var(--sp-16); }
+  .hero-strip__label { grid-column: 1 / -1; min-height: 64px; }
+  .hero-strip__cite { grid-column: span 2; }
+  .hero-strip__cite:nth-child(5), .hero-strip__cite:nth-child(6) { grid-column: span 3; }
+}
+
+/* ============================================================ sm (<768) */
+@media (max-width: 767.98px) {
+  .hero { display: block; }
+  .hero > .rail { display: none; }
+  .hero__stage--frame { display: none; }
+  .hero__stage--cell { display: block; }
+  .hero__main { display: block; }
+  .hero__content { display: block; }
+  .hero__floor { display: none; }
+  .hero__text { padding: 64px var(--gutter) 24px; }
+  .hero__line--last { display: block; }
+  .hero__sphere > .hero__sphere-lg { display: none; }
+  .hero__sphere > .hero__sphere-sm { display: block; }
+  .hero__sphere { vertical-align: -4px; margin: 0 0.04em 0 0.02em; }
+  .hero__h1 { margin-right: -12px; }
+  .hero__label { font-size: var(--fs-micro); letter-spacing: var(--ls-caps); }
+  .hero__fridge { height: 480px; border-block: 1px solid var(--line); overflow: hidden; }
+  .hero__fridge-fig { left: calc(50% - 112px); right: auto; }
+  .hero__label { width: calc(50% - 112px + var(--pl) * 4px - 4px); }
+  .hero__pillbar .pill__label { white-space: normal; text-align: left; }
+  .hero__pillbar .pill { padding-right: var(--sp-16); }
+  .hero-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero-strip__cite, .hero-strip__cite:nth-child(5) { grid-column: span 1; }
+  .hero-strip__cite:nth-child(6) { grid-column: 1 / -1; }
+}
+
+/* ============================================================ reduced motion: the final composition */
+:root[data-motion="reduced"] .hero__line-in { transform: none; transition: none; }
+:root[data-motion="reduced"] .hero__sphere .px { visibility: visible; transition: none; }
+:root[data-motion="reduced"] .hero__rise { clip-path: none; transform: none; transition: none; }
+:root[data-motion="reduced"] .hero__tag { visibility: visible; }
+:root[data-motion="reduced"] .hero__label { transition: none; }

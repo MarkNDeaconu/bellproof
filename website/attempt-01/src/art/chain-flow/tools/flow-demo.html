@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chain-flow · flow demo (QA only)</title>
+<style>
+  :root { --paper: #F4F2ED; --card: #FBFAF7; --hair: #DEDBD3; --ink: #0E1424; --soft: #475069; --blue: #2F5BEA; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.4 ui-sans-serif, system-ui, sans-serif; }
+  .pad { height: 70vh; display: grid; place-items: center; color: var(--soft); }
+  #flow { position: relative; width: 960px; margin: 0 auto; }
+  .lanes { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--hair); font: 12px ui-monospace, monospace; letter-spacing: .08em; }
+  .lanes p { margin: 0; padding: 8px 0; }
+  .lanes p:first-child { color: var(--blue); }
+  .rows { position: relative; }
+  .spine { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--hair); }
+  .row { height: 128px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; }
+  .card { margin: 0 88px 0 0; background: var(--card); border: 1px solid var(--hair); border-radius: 4px; padding: 14px 18px; display: flex; gap: 12px; align-items: center; }
+  .card.on { border-left: 4px solid var(--blue); }
+  .card.off { margin: 0 0 0 88px; }
+  .card.flash { border-left-color: #8FAEFF; }
+  .card b { font: 500 13px ui-monospace, monospace; color: var(--blue); }
+  .gut { position: absolute; width: 64px; height: 64px; }
+  .gut.l { left: calc(50% - 76px); }
+  .gut.r { left: calc(50% + 12px); }
+  #token { position: absolute; left: calc(50% - 24px); top: 0; width: 48px; height: 48px; }
+  #settle-wrap { position: absolute; left: calc(50% - 76px - 128px); }
+  #hud { position: fixed; right: 12px; top: 12px; font: 12px ui-monospace, monospace; background: var(--card); border: 1px solid var(--hair); padding: 8px 10px; }
+</style>
+</head>
+<body>
+<div class="pad">scroll ↓ (chain-flow demo: drives chain-block, job-token, magnifier-scroll, settle as the #flow section will)</div>
+<section id="flow">
+  <div class="lanes"><p>ON-CHAIN · money, commitments, verdicts</p><p>OFF-CHAIN · quantum work, heavy math</p></div>
+  <div class="rows" id="rows"><div class="spine"></div></div>
+</section>
+<div class="pad" style="height:110vh">end</div>
+<div id="hud"></div>
+<script type="module" src="./flow-demo.ts"></script>
+</body>
+</html>
